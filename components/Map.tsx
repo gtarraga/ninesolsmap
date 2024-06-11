@@ -12,8 +12,6 @@ import "leaflet-defaulticon-compatibility";
 // END: Preserve spaces to avoid auto-sorting
 
 
-// Map Range  [-0.12, 0.53]
-
 //Type definitions
 interface DataItem {
   id: string;
@@ -23,16 +21,7 @@ interface DataItem {
   type: string;
   description: string;
 }
-interface MarkersGroupProps {
-  type: string;
-  markers: DataItem[];
-}
-
-
-const eventHandlers = {
-  // Add your event handlers here
-};
-
+// Reference for markers
 const markerRef = React.createRef<L.Marker<any>>();
 
 function DraggableMarker() {
@@ -46,8 +35,9 @@ function DraggableMarker() {
   return (
     <Marker
       draggable={true}
+      icon={i.bonfire}
       eventHandlers={eventHandlers}
-      position={[-0.0765, 0.3]}
+      position={[-0.0972900390625, 0.443359375]}
       ref={markerRef}>
       <Popup minWidth={90}><span>{`Debugging marker.`}</span></Popup>
     </Marker>
@@ -64,25 +54,23 @@ const fetchMarkersData = async (): Promise<DataItem[]> => {
 };
 
 const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
-  <>
+  <LayerGroup>
     {markers.map(marker => (
       <Marker
         key={marker.id}
-        icon={i[marker.type]}
-        eventHandlers={eventHandlers}
+        icon={i[marker.type.toLowerCase()]}
         position={[marker.x, marker.y]}
         ref={markerRef}
       >
         <Popup minWidth={90}>
-          <span>{marker.description}</span>
+          <span>{marker.id}</span>
         </Popup>
       </Marker>
     ))}
-  </>
+  </LayerGroup>
 );
 
-
-export default function Map() {
+const MapComponent: React.FC = () => {
   const [data, setData] = useState<Record<string, DataItem[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +86,6 @@ export default function Map() {
           acc[item.type].push(item);
           return acc;
         }, {});
-        console.log('Grouped Data:', groupedData);
         setData(groupedData);
         setLoading(false);
       } catch (err) {
@@ -125,29 +112,37 @@ export default function Map() {
   return (
     <MapContainer
       crs={L.CRS.Simple}
-      center={[-0, 0.3]}
-      maxBounds={[[0.05, -0.05], [-0.17, 0.59]]}
+      center={[-0.0972900390625, 0.443359375]}
+      maxBounds={[[0.05, -0.05], [-0.317529296875, 1]]}
       maxBoundsViscosity={0.68}
       zoom={13}
-      minZoom={12}
+      minZoom={13}
       maxZoom={15}
       scrollWheelZoom={true}
       attributionControl={false}
       style={{ height: "100vh", background: "rgb(8,23,37)" }}
     >
-      <TileLayer url="https://ninesolsmap.s3.amazonaws.com/map/{z}/{x}/{y}.png" />
+      <TileLayer url="https://ninesolsmap.s3.amazonaws.com/mapBig/{z}/{x}/{y}.png" />
 
 
-      <LayersControl position="topright">
+      <LayersControl>
         {Object.keys(data).map(type => (
-          <LayersControl.Overlay key={type} checked name={type}>
-            <MarkersGroup markers={data[type]} />
-          </LayersControl.Overlay>
-        ))}
+            <LayersControl.Overlay key={type} checked name={
+              `
+                <div>
+                  <img src='/icons/${type}.png' width=24 />
+                  <Text style={{ textTransform: 'capitalize' }}>${type}</Text>
+                </div>
+              `
+            }>
+              <MarkersGroup markers={data[type]} />
+            </LayersControl.Overlay>
+          ))}
       </LayersControl>
 
-      <DraggableMarker />
-
+      <DraggableMarker/>
     </MapContainer>
   );
-}
+};
+
+export default MapComponent;
