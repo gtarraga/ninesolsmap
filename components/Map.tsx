@@ -124,7 +124,7 @@ const MapComponent: React.FC = () => {
       maxBounds={[[0.05, -0.05], [-0.317529296875, 1]]}
       maxBoundsViscosity={0.68}
       zoom={13}
-      minZoom={13}
+      // minZoom={13}
       maxZoom={15}
       scrollWheelZoom={true}
       attributionControl={false}
@@ -137,10 +137,8 @@ const MapComponent: React.FC = () => {
         {Object.keys(data).map(type => (
             <LayersControl.Overlay key={type} checked name={
               `
-                <div>
                   <img src='/icons/${type.toLowerCase()}.png' width=24 />
-                  <Text style={{ textTransform: 'capitalize' }}>${type}</Text>
-                </div>
+                  <Text class="pl-1" style={{ textTransform: 'capitalize' }}>${type}</Text>
               `
             }>
               <MarkersGroup markers={data[type]} />

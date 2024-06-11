@@ -31,3 +31,16 @@ body {
     text-wrap: balance;
   }
 }
+
+.leaflet-control-layers-overlays > label > span {
+  display: flex;
+  padding: 5px 0;
+  align-items: center;
+}
+
+
+.leaflet-control-layers-overlays > label > span > span {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+}
