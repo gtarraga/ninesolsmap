@@ -7,7 +7,7 @@ export const bonfire = new Icon({
 })
 
 export const bigchest = new Icon({
-  iconUrl: "./icons/bigChest.png",
+  iconUrl: "./icons/bigchest.png",
   iconSize: [30, 30]
 })
 

@@ -138,7 +138,7 @@ const MapComponent: React.FC = () => {
             <LayersControl.Overlay key={type} checked name={
               `
                 <div>
-                  <img src='/icons/${type}.png' width=24 />
+                  <img src='/icons/${type.toLowerCase()}.png' width=24 />
                   <Text style={{ textTransform: 'capitalize' }}>${type}</Text>
                 </div>
               `
