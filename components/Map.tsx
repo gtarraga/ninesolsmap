@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import L from 'leaflet'
 import { MapContainer, Marker, Popup, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
 import * as Icons from './Icons';
@@ -30,27 +30,6 @@ const getIcon = (type: string): typeof Icons[IconKeys] | undefined => {
   const iconKey = type.toLowerCase() as IconKeys;
   return Icons[iconKey];
 };
-
-
-function DraggableMarker() {
-  const markerRef = useRef(null)
-  const eventHandlers = useMemo(() => ({
-      dragend() {
-        const marker = markerRef.current
-        if (marker != null) console.log(marker);
-      },
-    }), [],)
-  return (
-    <Marker
-      draggable={true}
-      icon={getIcon('root')}
-      eventHandlers={eventHandlers}
-      position={[-0.0972900390625, 0.443359375]}
-      ref={markerRef}>
-      <Popup minWidth={90}><span>{`Debugging marker.`}</span></Popup>
-    </Marker>
-  )
-}
 
 const fetchMarkersData = async (): Promise<DataItem[]> => {
   const response = await fetch('/api/markers');
@@ -146,7 +125,6 @@ const MapComponent: React.FC = () => {
           ))}
       </LayersControl>
 
-      <DraggableMarker/>
     </MapContainer>
   );
 };
