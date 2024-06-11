@@ -43,7 +43,7 @@ function DraggableMarker() {
   return (
     <Marker
       draggable={true}
-      icon={getIcon('bonfire')}
+      icon={getIcon('root')}
       eventHandlers={eventHandlers}
       position={[-0.0972900390625, 0.443359375]}
       ref={markerRef}>
@@ -124,7 +124,7 @@ const MapComponent: React.FC = () => {
       maxBounds={[[0.05, -0.05], [-0.317529296875, 1]]}
       maxBoundsViscosity={0.68}
       zoom={13}
-      // minZoom={13}
+      minZoom={13}
       maxZoom={15}
       scrollWheelZoom={true}
       attributionControl={false}
@@ -137,8 +137,8 @@ const MapComponent: React.FC = () => {
         {Object.keys(data).map(type => (
             <LayersControl.Overlay key={type} checked name={
               `
-                  <img src='/icons/${type.toLowerCase()}.png' width=24 />
-                  <Text class="pl-1" style={{ textTransform: 'capitalize' }}>${type}</Text>
+                <img src='/icons/${type.toLowerCase()}.png' width=24 />
+                <Text class="pl-1" style={{ textTransform: 'capitalize' }}>${type}</Text>
               `
             }>
               <MarkersGroup markers={data[type]} />

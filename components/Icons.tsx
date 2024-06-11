@@ -1,8 +1,8 @@
 import { Icon } from "leaflet";
 
 
-export const bonfire = new Icon({
-  iconUrl: "./icons/bonfire.png",
+export const root = new Icon({
+  iconUrl: "./icons/root.png",
   iconSize: [30, 30]
 })
 
@@ -59,4 +59,49 @@ export const shanhai = new Icon({
 export const yi = new Icon({
   iconUrl: "./icons/yi.png",
   iconSize: [30, 30]
+})
+
+export const cpu = new Icon({
+  iconUrl: "./icons/cpu.png",
+  iconSize: [30, 30]
+})
+
+export const collectible = new Icon({
+  iconUrl: "./icons/collectibleClean.png",
+  iconSize: [30, 30]
+})
+
+export const data = new Icon({
+  iconUrl: "./icons/dataClean.png",
+  iconSize: [25, 25]
+})
+
+export const herb = new Icon({
+  iconUrl: "./icons/herb.png",
+  iconSize: [30, 30]
+})
+
+export const vial = new Icon({
+  iconUrl: "./icons/vial.png",
+  iconSize: [30, 30]
+})
+
+export const robot = new Icon({
+  iconUrl: "./icons/robot.png",
+  iconSize: [30, 30]
+})
+
+export const jade = new Icon({
+  iconUrl: "./icons/jade.png",
+  iconSize: [30, 30]
+})
+
+export const keyitem = new Icon({
+  iconUrl: "./icons/keyitem.png",
+  iconSize: [25, 25]
+})
+
+export const artifact = new Icon({
+  iconUrl: "./icons/artifact.png",
+  iconSize: [25, 25]
 })
