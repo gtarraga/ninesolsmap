@@ -3,7 +3,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import L from 'leaflet'
 import { MapContainer, Marker, Popup, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
-import * as i from './Icons';
+import * as Icons from './Icons';
 
 // START: Preserve spaces to avoid auto-sorting
 import "leaflet/dist/leaflet.css";
@@ -21,8 +21,16 @@ interface DataItem {
   type: string;
   description: string;
 }
+type IconKeys = keyof typeof Icons;
+
 // Reference for markers
 const markerRef = React.createRef<L.Marker<any>>();
+
+const getIcon = (type: string): typeof Icons[IconKeys] | undefined => {
+  const iconKey = type.toLowerCase() as IconKeys;
+  return Icons[iconKey];
+};
+
 
 function DraggableMarker() {
   const markerRef = useRef(null)
@@ -35,7 +43,7 @@ function DraggableMarker() {
   return (
     <Marker
       draggable={true}
-      icon={i.bonfire}
+      icon={getIcon('bonfire')}
       eventHandlers={eventHandlers}
       position={[-0.0972900390625, 0.443359375]}
       ref={markerRef}>
@@ -58,7 +66,7 @@ const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
     {markers.map(marker => (
       <Marker
         key={marker.id}
-        icon={i[marker.type.toLowerCase()]}
+        icon={getIcon(marker.type.toLowerCase())}
         position={[marker.x, marker.y]}
         ref={markerRef}
       >

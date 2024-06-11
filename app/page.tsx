@@ -17,7 +17,7 @@ export default function Home() {
         </nav> */}
         <p>This is under development but you can still</p>
         <StyledKofiButton />
-        <p>I'm planning to have finished by the end of the week.</p>
+        <p>I am planning to have finished by the end of the week.</p>
         
       </header>
       <LazyMap />
