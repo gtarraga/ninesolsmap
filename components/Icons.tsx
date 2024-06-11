@@ -67,12 +67,12 @@ export const cpu = new Icon({
 })
 
 export const collectible = new Icon({
-  iconUrl: "./icons/collectibleClean.png",
-  iconSize: [30, 30]
+  iconUrl: "./icons/collectible.png",
+  iconSize: [25, 25]
 })
 
 export const data = new Icon({
-  iconUrl: "./icons/dataClean.png",
+  iconUrl: "./icons/data.png",
   iconSize: [25, 25]
 })
 
@@ -104,4 +104,9 @@ export const keyitem = new Icon({
 export const artifact = new Icon({
   iconUrl: "./icons/artifact.png",
   iconSize: [25, 25]
+})
+
+export const darksteel = new Icon({
+  iconUrl: "./icons/darksteel.png",
+  iconSize: [30, 30]
 })
