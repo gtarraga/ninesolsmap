@@ -71,7 +71,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
 
   // Open popup if a single marker is shown
   const markerInit = (ref: L.Marker) => {
+    // logging for production
+    console.log('a');
     if(ref) {
+      console.log('ref', ref);
       ref.openPopup()
     }
   }
