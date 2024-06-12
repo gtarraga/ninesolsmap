@@ -50,7 +50,11 @@ const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
         ref={markerRef}
       >
         <Popup minWidth={90}>
-          <span>{marker.id}</span>
+          <div className=''>
+            <div className='py-2 text-[0.95rem]'>{marker.description}</div>
+            <hr className='py-1'/>
+            <div className='text-center text-slate-400/70'>id: <span className='italics text-xs'>{marker.id}</span></div>
+          </div>
         </Popup>
       </Marker>
     ))}
