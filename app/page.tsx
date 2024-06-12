@@ -3,7 +3,7 @@
 import { StyledKofiButton } from "@/components/KofiButton";
 import dynamic from "next/dynamic";
 
-const LazyMap = dynamic(() => import("@/components/Map"), {
+const MapComponent = dynamic(() => import('@/components/Map'), {
   ssr: false,
   loading: () => <p>Loading...</p>,
 });
@@ -21,7 +21,7 @@ export default function Home() {
           <StyledKofiButton />
         
       </header>
-      <LazyMap />
+      <MapComponent />
     </main>
   );
 }
