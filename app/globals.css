@@ -44,3 +44,14 @@ body {
   align-items: center;
   padding: 0 5px;
 }
+
+.share-button {
+  position: relative;
+  transition: transform ease-in 0s, box-shadow ease-in 0.25s;
+}
+
+.share-button:active {
+  transform: scale(0.9);
+  background-color: #2ac38b;
+  box-shadow: 0 2px 25px rgba(40, 164, 119, 0.2);
+}
