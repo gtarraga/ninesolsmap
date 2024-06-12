@@ -71,11 +71,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
 
   // Open popup if a single marker is shown
   const markerInit = (ref: L.Marker) => {
-    // logging for production
     if(ref) {
+      // If there's no timeout, the popup wont appear in production
       setTimeout(() => {
         ref.openPopup()
-        console.log('ref', ref);
       }, 100);
     }
   }
