@@ -6,7 +6,7 @@ export async function GET (
   ) {
     try {
         const supabase = createClient()
-        const { data, error } = await supabase.from("markers").select("*");
+        const { data, error } = await supabase.from("markers_id").select("*");
 
         if(error) {
           console.log(error.message);

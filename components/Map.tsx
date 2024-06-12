@@ -9,11 +9,12 @@ import * as Icons from './Icons';
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
+import { MarkerPopup } from './MarkerPopup';
 // END: Preserve spaces to avoid auto-sorting
 
 
 //Type definitions
-interface DataItem {
+export interface DataItem {
   id: string;
   created_at: string;
   x: number;
@@ -33,25 +34,6 @@ const getIcon = (type: string): typeof Icons[IconKeys] | undefined => {
   else console.log(type);
 };
 
-function DraggableMarker() {
-  const markerRef = useRef(null);
-  const eventHandlers = useMemo(() => ({
-    dragend() {
-      const marker = markerRef.current;
-      if (marker != null) console.log(marker);
-    },
-  }), []);
-  return (
-    <Marker
-      draggable={true}
-      icon={getIcon('root')}
-      eventHandlers={eventHandlers}
-      position={[-0.0972900390625, 0.443359375]}
-      ref={markerRef}>
-      <Popup minWidth={90}><span>{`Debugging marker.`}</span></Popup>
-    </Marker>
-  );
-}
 
 const fetchMarkersData = async (): Promise<DataItem[]> => {
   const response = await fetch('/api/markers');
@@ -71,13 +53,7 @@ const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
         position={[marker.x, marker.y]}
         ref={markerRef}
       >
-        <Popup minWidth={90}>
-          <div className=''>
-            <div className='py-2 text-[0.95rem]'>{marker.description}</div>
-            <hr className='py-1'/>
-            <div className='text-center text-slate-400/70'>id: <span className='italics text-xs'>{marker.id}</span></div>
-          </div>
-        </Popup>
+        <MarkerPopup marker={marker as DataItem}/>
       </Marker>
     ))}
   </LayerGroup>
@@ -92,6 +68,13 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAllMarkers, setShowAllMarkers] = useState(false);
+
+  // Open popup if a single marker is shown
+  const markerInit = (ref: L.Marker) => {
+    if(ref) {
+      ref.openPopup()
+    }
+  }
 
   useEffect(() => {
     setShowAllMarkers(!markerId);
@@ -134,7 +117,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className='h-screen'>Loading...</div>;
   }
 
   if (error) {
@@ -150,10 +133,12 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
       maxBounds={[[0.05, -0.05], [-0.317529296875, 1]]}
       maxBoundsViscosity={0.68}
       zoom={13}
+      minZoom={13}
       maxZoom={15}
       scrollWheelZoom={true}
       attributionControl={false}
       style={{ height: '100vh', background: 'rgb(8,23,37)' }}
+      // @ts-ignore: I cant figure out a way to do this wihtout changing the type defintion
       whenReady={(event: LeafletEvent) => {
         if (markerId && initialMarker) {
           event.target.setView([initialMarker.x, initialMarker.y], 15);
@@ -180,20 +165,13 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
           <Marker
             icon={getIcon(initialMarker.type.toLowerCase())}
             position={[initialMarker.x, initialMarker.y]}
-            ref={markerRef}
+            ref={markerInit}
           >
-            <Popup minWidth={90}>
-              <div className=''>
-                <div className='py-2 text-[0.95rem]'>{initialMarker.description}</div>
-                <hr className='py-1' />
-                <div className='text-center text-slate-400/70'>id: <span className='italics text-xs'>{initialMarker.id}</span></div>
-              </div>
-            </Popup>
+            <MarkerPopup marker={initialMarker as DataItem} />
           </Marker>
         )
       )}
 
-      <DraggableMarker />
       <MapClickHandler />
     </MapContainer>
   );
