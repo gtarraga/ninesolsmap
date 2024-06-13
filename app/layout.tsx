@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Nine Sols Interactive Map",
-  description: "To save you time finding that last item in an area.",
+  description: "To save you time finding that last item in an area.\n\nAn interactive map for Nine Sols with all items, map chips, bosses and more!",
   metadataBase: new URL('https://ninesolsmap.com'),
 };
 
