@@ -1,15 +1,16 @@
 "use client"
 
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import L, { LeafletEvent } from 'leaflet';
-import { MapContainer, Marker, Popup, TileLayer, LayersControl, LayerGroup, useMap } from 'react-leaflet';
-import * as Icons from './Icons';
+import { MapContainer, Marker, TileLayer, LayersControl, LayerGroup, useMap } from 'react-leaflet';
+import { MarkerPopup } from './MarkerPopup';
+import { getName } from '@/app/utils/getNames';
+import { getIcon } from '@/app/utils/getIcons';
 
 // START: Preserve spaces to avoid auto-sorting
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
-import { MarkerPopup } from './MarkerPopup';
 // END: Preserve spaces to avoid auto-sorting
 
 
@@ -22,18 +23,9 @@ export interface DataItem {
   type: string;
   description: string;
 }
-type IconKeys = keyof typeof Icons;
 
 // Reference for markers
 const markerRef = React.createRef<L.Marker<any>>();
-
-const getIcon = (type: string): typeof Icons[IconKeys] | undefined => {
-  const iconKey = type.toLowerCase() as IconKeys;
-  // Logging for db error
-  if (Icons[iconKey]) return Icons[iconKey];
-  else console.log(type);
-};
-
 
 const fetchMarkersData = async (): Promise<DataItem[]> => {
   const response = await fetch('/api/markers');
@@ -72,10 +64,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
   // Open popup if a single marker is shown
   const markerInit = (ref: L.Marker) => {
     if(ref) {
-      // If there's no timeout, the popup wont appear in production
-      setTimeout(() => {
-        ref.openPopup()
-      }, 100);
+      ref.openPopup()
     }
   }
 
@@ -129,6 +118,14 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
 
   const initialMarker = markerId ? Object.values(data).flat().find(m => m.id === markerId) : null;
 
+  // Sorting the markers and replacing the name with the formatted name
+  const sortedKeys = Object.keys(data).sort((a, b) => getName(a).localeCompare(getName(b)));
+  const sortedData = sortedKeys.map(type => ({
+    name: getName(type),
+    type,
+    markers: data[type],
+  }));
+
   return (
     <MapContainer
       crs={L.CRS.Simple}
@@ -152,16 +149,16 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
 
       {showAllMarkers ? (
         <LayersControl>
-          {Object.keys(data).map(type => (
+          {sortedData.map(({ name, type, markers }) => (
             <LayersControl.Overlay key={type} checked name={
               `
                 <img src='/icons/${type.toLowerCase()}.png' width=24 />
-                <Text class="pl-1" style={{ textTransform: 'capitalize' }}>${type}</Text>
+                <Text class="pl-1" style={{ textTransform: 'capitalize' }}>${name}</Text>
               `
             }>
-              <MarkersGroup markers={data[type]} />
+              <MarkersGroup markers={markers} />
             </LayersControl.Overlay>
-          ))}
+          ))};
         </LayersControl>
       ) : (
         initialMarker && (
