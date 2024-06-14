@@ -2,10 +2,11 @@
 
 import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const MapComponent = dynamic(() => import('@/components/Map'), {
   ssr: false,
-  loading: () => <div className='h-screen'>Loading...</div>,
+  loading: () => <LoadingScreen />,
 });
 
 const MapPage = () => {

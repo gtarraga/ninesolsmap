@@ -6,6 +6,7 @@ import { MapContainer, Marker, TileLayer, LayersControl, LayerGroup, useMap } fr
 import { MarkerPopup } from './MarkerPopup';
 import { getName } from '@/app/utils/getNames';
 import { getIcon } from '@/app/utils/getIcons';
+import { LoadingScreen } from './LoadingScreen';
 
 // START: Preserve spaces to avoid auto-sorting
 import "leaflet/dist/leaflet.css";
@@ -97,7 +98,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
     return null;
   };
 
-  if (loading) return <div className='h-screen'>Loading...</div>;
+  if (loading) return <LoadingScreen/>;
   if (error) return <div>Error: {error}</div>;
 
   const initialMarker = markerId ? Object.values(data).flat().find(m => m.id === markerId) : null;
