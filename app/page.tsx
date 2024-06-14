@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { LoadingScreen } from "@/app/components/LoadingScreen";
 
-const MapComponent = dynamic(() => import('@/components/Map'), {
+const MapComponent = dynamic(() => import('@/app/components/Map'), {
   ssr: false,
   loading: () => <LoadingScreen />,
 });
