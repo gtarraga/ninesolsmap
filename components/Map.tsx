@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import L, { LeafletEvent } from 'leaflet';
 import { MapContainer, Marker, TileLayer, LayersControl, LayerGroup, useMap } from 'react-leaflet';
 import { MarkerPopup } from './MarkerPopup';
@@ -13,8 +13,6 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 // END: Preserve spaces to avoid auto-sorting
 
-
-//Type definitions
 export interface DataItem {
   id: string;
   created_at: string;
@@ -24,16 +22,13 @@ export interface DataItem {
   description: string;
 }
 
-// Reference for markers
-const markerRef = React.createRef<L.Marker<any>>();
 
 const fetchMarkersData = async (): Promise<DataItem[]> => {
   const response = await fetch('/api/markers');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
-  const data: DataItem[] = await response.json();
-  return data;
+  return response.json();
 };
 
 const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
@@ -43,9 +38,8 @@ const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
         key={marker.id}
         icon={getIcon(marker.type.toLowerCase())}
         position={[marker.x, marker.y]}
-        ref={markerRef}
       >
-        <MarkerPopup marker={marker as DataItem}/>
+        <MarkerPopup marker={marker} />
       </Marker>
     ))}
   </LayerGroup>
@@ -59,38 +53,30 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
   const [data, setData] = useState<Record<string, DataItem[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAllMarkers, setShowAllMarkers] = useState(false);
+  const [showAllMarkers, setShowAllMarkers] = useState(!markerId);
 
-  // Open popup if a single marker is shown
-  const markerInit = (ref: L.Marker) => {
-    if(ref) {
-      ref.openPopup()
+  const markerInit = useCallback((ref: L.Marker) => {
+    if (ref) {
+      // If there's no timeout, the popup wont appear in production
+      setTimeout(() => {
+        ref.openPopup()
+      }, 100);
     }
-  }
-
-  useEffect(() => {
-    setShowAllMarkers(!markerId);
-  }, [markerId]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const markersData = await fetchMarkersData();
         const groupedData = markersData.reduce<Record<string, DataItem[]>>((acc, item) => {
-          if (!acc[item.type]) {
-            acc[item.type] = [];
-          }
+          if (!acc[item.type]) acc[item.type] = [];
           acc[item.type].push(item);
           return acc;
         }, {});
         setData(groupedData);
-        setLoading(false);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unknown error occurred');
-        }
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
         setLoading(false);
       }
     };
@@ -98,33 +84,32 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
     fetchData();
   }, []);
 
-  const handleClick = () => {
-    setShowAllMarkers(true);
-  };
+  const handleClick = () => setShowAllMarkers(true);
 
   const MapClickHandler = () => {
     const map = useMap();
-    map.on('click', handleClick);
+    useEffect(() => {
+      map.on('click', handleClick);
+      return () => {
+        map.off('click', handleClick);
+      };
+    }, [map]);
     return null;
   };
 
-  if (loading) {
-    return <div className='h-screen'>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div className='h-screen'>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   const initialMarker = markerId ? Object.values(data).flat().find(m => m.id === markerId) : null;
 
   // Sorting the markers and replacing the name with the formatted name
-  const sortedKeys = Object.keys(data).sort((a, b) => getName(a).localeCompare(getName(b)));
-  const sortedData = sortedKeys.map(type => ({
-    name: getName(type),
-    type,
-    markers: data[type],
-  }));
+  const sortedData = Object.keys(data)
+    .sort((a, b) => getName(a).localeCompare(getName(b)))
+    .map(type => ({
+      name: getName(type),
+      type,
+      markers: data[type],
+    }));
 
   return (
     <MapContainer
@@ -146,7 +131,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
       }}
     >
       <TileLayer url="https://ninesolsmap.s3.amazonaws.com/mapBig/{z}/{x}/{y}.png" />
-
       {showAllMarkers ? (
         <LayersControl>
           {sortedData.map(({ name, type, markers }) => (
@@ -158,7 +142,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
             }>
               <MarkersGroup markers={markers} />
             </LayersControl.Overlay>
-          ))};
+          ))}
         </LayersControl>
       ) : (
         initialMarker && (
@@ -167,11 +151,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
             position={[initialMarker.x, initialMarker.y]}
             ref={markerInit}
           >
-            <MarkerPopup marker={initialMarker as DataItem} />
+            <MarkerPopup marker={initialMarker} />
           </Marker>
         )
       )}
-
+      
       <MapClickHandler />
     </MapContainer>
   );
