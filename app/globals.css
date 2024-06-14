@@ -6,6 +6,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  overflow: hidden;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -54,4 +55,8 @@ body {
   transform: scale(0.9);
   background-color: #2ac38b;
   box-shadow: 0 2px 25px rgba(40, 164, 119, 0.2);
+}
+
+#map{
+  z-index: 0;
 }

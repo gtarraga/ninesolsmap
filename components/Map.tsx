@@ -114,6 +114,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
 
   return (
     <MapContainer
+      id="map"
       crs={L.CRS.Simple}
       center={[-0.0972900390625, 0.443359375]}
       maxBounds={[[0.05, -0.05], [-0.317529296875, 1]]}
