@@ -1,17 +1,6 @@
-"use client";
+import {redirect} from 'next/navigation';
 
-import dynamic from "next/dynamic";
-import { LoadingScreen } from "@/app/components/LoadingScreen";
-
-const MapComponent = dynamic(() => import('@/app/components/Map'), {
-  ssr: false,
-  loading: () => <LoadingScreen />,
-});
-
-export default function Home() {
-  return (
-    <main>
-      <MapComponent />;
-    </main>
-  );
+// This page only renders when the app is built statically (output: 'export')
+export default function RootPage() {
+  redirect('/en');
 }

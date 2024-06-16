@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { CSPostHogProvider } from './providers'
+import "@/app/globals.css";
+import { CSPostHogProvider } from '../providers'
 import { Header } from "@/app/components/Header";
+import {NextIntlClientProvider} from 'next-intl';
+import {getMessages} from 'next-intl/server';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,17 +14,25 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://ninesolsmap.com'),
 };
 
-export default function RootLayout({
+export default async function LocaleLayout({
   children,
-}: Readonly<{
+  params: { locale }
+}: {
   children: React.ReactNode;
-}>) {
+  params: {locale: string};
+}) {
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <CSPostHogProvider>
         <body className={inter.className}>
-          <Header />
-          {children}
+          <NextIntlClientProvider messages={messages}>
+            <Header />
+            {children}
+          </NextIntlClientProvider>
         </body>
       </CSPostHogProvider>
     </html>

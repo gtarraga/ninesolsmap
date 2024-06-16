@@ -4,91 +4,91 @@ type IconKeys = keyof typeof Icons;
 
 export const Icons = {
   root: new Icon({
-    iconUrl: "./icons/root.png",
+    iconUrl: "/icons/root.png",
     iconSize: [30, 30]
   }),
   bigchest: new Icon({
-    iconUrl: "./icons/bigchest.png",
+    iconUrl: "/icons/bigchest.png",
     iconSize: [30, 30]
   }),
   boss: new Icon({
-    iconUrl: "./icons/boss.png",
+    iconUrl: "/icons/boss.png",
     iconSize: [40, 40]
   }),
   chest: new Icon({
-    iconUrl: "./icons/chest.png",
+    iconUrl: "/icons/chest.png",
     iconSize: [22, 18]
   }),
   chiyou: new Icon({
-    iconUrl: "./icons/chiyou.png",
+    iconUrl: "/icons/chiyou.png",
     iconSize: [32, 32]
   }),
   fruit: new Icon({
-    iconUrl: "./icons/fruit.png",
+    iconUrl: "/icons/fruit.png",
     iconSize: [30, 30]
   }),
   hack: new Icon({
-    iconUrl: "./icons/hack.png",
+    iconUrl: "/icons/hack.png",
     iconSize: [30, 30]
   }),
   idk: new Icon({
-    iconUrl: "./icons/idk.png",
+    iconUrl: "/icons/idk.png",
     iconSize: [30, 30]
   }),
   miniboss: new Icon({
-    iconUrl: "./icons/miniboss.png",
+    iconUrl: "/icons/miniboss.png",
     iconSize: [30, 30]
   }),
   poison: new Icon({
-    iconUrl: "./icons/poison.png",
+    iconUrl: "/icons/poison.png",
     iconSize: [30, 30]
   }),
   shanhai: new Icon({
-    iconUrl: "./icons/shanhai.png",
+    iconUrl: "/icons/shanhai.png",
     iconSize: [30, 30]
   }),
   yi: new Icon({
-    iconUrl: "./icons/yi.png",
+    iconUrl: "/icons/yi.png",
     iconSize: [30, 30]
   }),
   cpu: new Icon({
-    iconUrl: "./icons/cpu.png",
+    iconUrl: "/icons/cpu.png",
     iconSize: [30, 30]
   }),
   collectible: new Icon({
-    iconUrl: "./icons/collectible.png",
+    iconUrl: "/icons/collectible.png",
     iconSize: [25, 25]
   }),
   data: new Icon({
-    iconUrl: "./icons/data.png",
+    iconUrl: "/icons/data.png",
     iconSize: [25, 25]
   }),
   herb: new Icon({
-    iconUrl: "./icons/herb.png",
+    iconUrl: "/icons/herb.png",
     iconSize: [30, 30]
   }),
   vial: new Icon({
-    iconUrl: "./icons/vial.png",
+    iconUrl: "/icons/vial.png",
     iconSize: [30, 30]
   }),
   robot: new Icon({
-    iconUrl: "./icons/robot.png",
+    iconUrl: "/icons/robot.png",
     iconSize: [30, 30]
   }),
   jade: new Icon({
-    iconUrl: "./icons/jade.png",
+    iconUrl: "/icons/jade.png",
     iconSize: [30, 30]
   }),
   keyitem: new Icon({
-    iconUrl: "./icons/keyitem.png",
+    iconUrl: "/icons/keyitem.png",
     iconSize: [25, 25]
   }),
   artifact: new Icon({
-    iconUrl: "./icons/artifact.png",
+    iconUrl: "/icons/artifact.png",
     iconSize: [25, 25]
   }),
   darksteel: new Icon({
-    iconUrl: "./icons/darksteel.png",
+    iconUrl: "/icons/darksteel.png",
     iconSize: [30, 30]
   })
 };

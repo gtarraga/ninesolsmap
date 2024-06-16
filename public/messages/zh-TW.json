@@ -1,0 +1,36 @@
+{
+  "title": "九日 互動式地圖",
+  "kofi-button": "創建者贊助連結(網站託管費用)",
+  "help-title": "歡迎使用 九日 互動式地圖",
+  "help-1": "創建此項目是為了幫助那些需要查找物品或者尋找遺漏部分的人們",
+  "help-2": "每個標記都有關於標記項目的說明，如果需要，還可以從地圖標記上獲取小提示。為了方便與他人分享，還可以複製標記相關的URL，將可以使地圖上只顯示該標記。",
+  "help-3": "如果想要再次顯示所有標記，只要點擊地圖上任意位置即可。",
+  "help-suggestion": "如果您對標記有任何建議或者修改意見，請與我們聯繫。",
+  "help-link": "這裡有一份電子表格，您可以將意見添加至其中。",
+  "copy-url": "複製 URL",
+
+  "Root": "古树节点",
+  "Chest": "宝箱",
+  "Collectible": "收集道具",
+  "Shanhai": "山海 9000",
+  "Chiyou": "蚩尤",
+  "Poison": "毒物",
+  "KeyItem": "关键道具",
+  "Miniboss": "菁英头目",
+  "Fruit": "道果",
+  "Artifact": "文物",
+  "CPU": "算力元件",
+  "Jade": "玉石",
+  "Boss": "头目战",
+  "Robot": "格挡机器人",
+  "Herb": "丹药催化器",
+  "Data": "资料",
+  "DarkSteel": "玄铁",
+  "Vial": "药瓶",
+  "Hack": "骇入地点",
+
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, en {English} zh-TW {繁體中文} zh-CN {简体中文}}"
+  }
+}

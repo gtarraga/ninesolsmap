@@ -12,6 +12,8 @@ import { LoadingScreen } from './LoadingScreen';
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
+import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 // END: Preserve spaces to avoid auto-sorting
 
 export interface DataItem {
@@ -21,6 +23,8 @@ export interface DataItem {
   y: number;
   type: string;
   description: string;
+  traditional: string;
+  simplified: string;
 }
 
 
@@ -32,7 +36,7 @@ const fetchMarkersData = async (): Promise<DataItem[]> => {
   return response.json();
 };
 
-const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
+const MarkersGroup: React.FC<{ markers: DataItem[], locale: string }> = ({ markers, locale }) => (
   <LayerGroup>
     {markers.map(marker => (
       <Marker
@@ -40,7 +44,7 @@ const MarkersGroup: React.FC<{ markers: DataItem[] }> = ({ markers }) => (
         icon={getIcon(marker.type.toLowerCase())}
         position={[marker.x, marker.y]}
       >
-        <MarkerPopup marker={marker} />
+        <MarkerPopup marker={marker} locale={locale} />
       </Marker>
     ))}
   </LayerGroup>
@@ -55,6 +59,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAllMarkers, setShowAllMarkers] = useState(!markerId);
+  const params = useParams<{ locale: string | string[] }>();
+  const locale = Array.isArray(params.locale) ? params.locale[0] : params.locale;
+  const t = useTranslations();
 
   const markerInit = useCallback((ref: L.Marker) => {
     if (ref) {
@@ -105,9 +112,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
 
   // Sorting the markers and replacing the name with the formatted name
   const sortedData = Object.keys(data)
-    .sort((a, b) => getName(a).localeCompare(getName(b)))
+    .sort((a, b) => getName(a, t).localeCompare(getName(b, t)))
     .map(type => ({
-      name: getName(type),
+      name: getName(type, t),
       type,
       markers: data[type],
     }));
@@ -142,7 +149,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
                 <Text class="pl-1" style={{ textTransform: 'capitalize' }}>${name}</Text>
               `
             }>
-              <MarkersGroup markers={markers} />
+              <MarkersGroup markers={markers} locale={locale} />
             </LayersControl.Overlay>
           ))}
         </LayersControl>
@@ -153,7 +160,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
             position={[initialMarker.x, initialMarker.y]}
             ref={markerInit}
           >
-            <MarkerPopup marker={initialMarker} />
+            <MarkerPopup marker={initialMarker} locale={locale} />
           </Marker>
         )
       )}

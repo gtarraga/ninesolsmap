@@ -1,0 +1,36 @@
+{
+  "title": "Nine Sols Interactive Map",
+  "kofi-button": "Support costing hosts",
+  "help-title": "Welcome to the Nine Sols Interactive Map",
+  "help-1": "This project was created to help people that need to find an item or want to see their missing parts of the map.",
+  "help-2": "Each marker has a description of what the marker item is and, if relevant, a small tip to obtain it. To make it easier to share with people, you can also quickly copy the share URL. This will only show that marker on the map.",
+  "help-3": "To show all markers again, simply click anywhere on the map.",
+  "help-suggestion": "If you have any suggestions or changes for markers,",
+  "help-link": "here’s a spreadsheet you can add it to.",
+  "copy-url": "Copy URL",
+  
+  "Root": "Root Nodes",
+  "Chest": "Chests",
+  "Collectible": "Collectibles",
+  "Shanhai": "Shanhai 9000",
+  "Chiyou": "Chiyou Locations",
+  "Poison": "Poisons",
+  "KeyItem": "Key Items",
+  "Miniboss": "Minibosses",
+  "Fruit": "Tao Fruits",
+  "Artifact": "Artifacts",
+  "CPU": "Computing Units",
+  "Jade": "Jades",
+  "Boss": "Bosses",
+  "Robot": "Parry Robots",
+  "Herb": "Herb Catalysts",
+  "Data": "Data Spots",
+  "DarkSteel": "Dark Steel",
+  "Vial": "Pipe Vials",
+  "Hack": "Hack Points",
+
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, en {English} zh-TW {繁體中文} zh-CN {简体中文}}"
+  }
+}
