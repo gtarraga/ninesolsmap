@@ -29,8 +29,9 @@
   "Vial": "藥瓶",
   "Hack": "駭入地點",
 
-  "LocaleSwitcher": {
-    "label": "Change language",
-    "locale": "{locale, select, en {English} zh-TW {繁體中文} zh-CN {简体中文}}"
+  "Metadata": {
+    "title": "九日 互动式地图",
+    "description": "为了节省您在区域内寻找最后一个物品的时间。\n\n九日的互动地图，包含所有物品、地图芯片、头目等！",
+    "image": "/opengraph-image-cn.png"
   }
 }

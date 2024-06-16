@@ -1,14 +1,15 @@
 import createMiddleware from 'next-intl/middleware';
  
 export default createMiddleware({
-  // A list of all locales that are supported
   locales: ['en', 'zh-TW', 'zh-CN'],
- 
-  // Used when no locale matches
   defaultLocale: 'en'
 });
- 
+
+// This matches all urls except api, _next, _vercel and the ones that contain a dot. 
+// It will redirect all the others to the default locale
 export const config = {
-  // Match only internationalized pathnames
-  matcher: ['/', '/(en|zh-TW|zh-CN)/:path*']
+  matcher: [
+    '/((?!api|_next|_vercel|.*\\..*).*)',
+    '/([\\w-]+)?/users/(.+)'
+  ]
 };

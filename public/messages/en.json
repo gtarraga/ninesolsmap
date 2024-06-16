@@ -29,8 +29,9 @@
   "Vial": "Pipe Vials",
   "Hack": "Hack Points",
 
-  "LocaleSwitcher": {
-    "label": "Change language",
-    "locale": "{locale, select, en {English} zh-TW {繁體中文} zh-CN {简体中文}}"
+  "Metadata": {
+    "title": "Nine Sols Interactive Map",
+    "description": "To save you time finding that last item in an area.\n\nAn interactive map for Nine Sols with all items, map chips, bosses and more!",
+    "image": "/opengraph-image.png"
   }
 }
