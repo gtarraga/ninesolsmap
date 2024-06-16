@@ -23,6 +23,7 @@ export async function generateMetadata({ params: { locale } }: Params) {
   return {
     title: t('title'),
     description: t('description'),
+    metadataBase: new URL('https://ninesolsmap.com'),
     openGraph: {
       title: t('title'),
       description: t('description'),
@@ -32,7 +33,7 @@ export async function generateMetadata({ params: { locale } }: Params) {
         }
       ],
       locale: locale,
-      type: 'website' // Optional: Add the type of the OpenGraph object
+      type: 'website'
     },
   };
 }
