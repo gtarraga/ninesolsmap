@@ -1,24 +1,16 @@
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import { CSPostHogProvider } from "./providers";
-import { Header } from "@/app/components/Header";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
-import { getTranslations } from "next-intl/server";
-import { openGraphImages } from "@/lib/opengraphImages";
 import AdSense from "./components/AdSense";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default async function LocaleLayout({
+export default async function Layout({
   children,
-  params: { locale },
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const messages = await getMessages();
-
   return (
     <html>
       <CSPostHogProvider>
