@@ -1,12 +1,12 @@
-
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
-import { CSPostHogProvider } from '../providers'
+import { CSPostHogProvider } from "../providers";
 import { Header } from "@/app/components/Header";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { getTranslations } from 'next-intl/server';
-import { openGraphImages } from '@/lib/opengraphImages';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { openGraphImages } from "@/lib/opengraphImages";
+import AdSense from "../components/AdSense";
 
 interface Params {
   params: {
@@ -15,41 +15,44 @@ interface Params {
 }
 
 const inter = Inter({ subsets: ["latin"] });
- 
+
 export async function generateMetadata({ params: { locale } }: Params) {
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
-  const openGraphImage = openGraphImages[locale] || openGraphImages['en'];
+  const t = await getTranslations({ locale, namespace: "Metadata" });
+  const openGraphImage = openGraphImages[locale] || openGraphImages["en"];
 
   return {
-    title: t('title'),
-    description: t('description'),
-    metadataBase: new URL('https://ninesolsmap.com'),
+    title: t("title"),
+    description: t("description"),
+    metadataBase: new URL("https://ninesolsmap.com"),
     openGraph: {
-      title: t('title'),
-      description: t('description'),
+      title: t("title"),
+      description: t("description"),
       images: [
         {
           url: openGraphImage,
-        }
+        },
       ],
       locale: locale,
-      type: 'website'
+      type: "website",
     },
   };
 }
 
 export default async function LocaleLayout({
   children,
-  params: { locale }
+  params: { locale },
 }: {
   children: React.ReactNode;
-  params: {locale: string};
+  params: { locale: string };
 }) {
   const messages = await getMessages();
 
   return (
     <html lang={locale}>
       <CSPostHogProvider>
+        <head>
+          <AdSense pId="ca-pub-1640535171105894" />
+        </head>
         <body className={inter.className}>
           <NextIntlClientProvider messages={messages}>
             <Header />
