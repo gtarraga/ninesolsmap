@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import {useTranslations} from 'next-intl';
-
+import { useTranslations } from "next-intl";
 
 const HelpModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations();
-
 
   const openModal = () => {
     setIsOpen(true);
@@ -53,28 +51,20 @@ const HelpModal: React.FC = () => {
         </span>
 
         <div className="p-4">
-          <h1 className="text-3xl font-bold">
-            {t("help-title")}
-          </h1>
-          <p className="mt-2 py-2">
-            {t("help-1")}
-          </p>
+          <h1 className="text-3xl font-bold">{t("help-title")}</h1>
+          <p className="mt-2 py-2">{t("help-1")}</p>
 
           <hr className="my-4 border-t border-gray-700" />
-          <p className="mt-2 py-2">
-            {t("help-2")}
-          </p>
-          <p className="mt-2">
-            {t("help-3")}
-          </p>
-
+          <p className="mt-2 py-2">{t("help-2")}</p>
+          <p className="mt-2">{t("help-3")}</p>
+          {/* 
           <hr className="my-4 border-t border-gray-700" />
           <p className="mt-2 py-2">
             {t("help-suggestion")}{" "}
             <a href="https://docs.google.com/spreadsheets/d/1mWO0Kh3wYk_J9xQBLqgUTzylosoOkID6p-90iZOtTHY/edit?usp=sharing" className="text-emerald-600 dark:text-amber-400 hover:underline">
               {t("help-link")}
             </a>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>,
