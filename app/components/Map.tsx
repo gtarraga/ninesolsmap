@@ -139,7 +139,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markerId }) => {
         }
       }}
     >
-      <TileLayer url="https://ninesolsmap.s3.amazonaws.com/mapBig/{z}/{x}/{y}.png" />
+      <TileLayer url="https://map.ninesolsmap.com/map/{z}/{x}/{y}.png" />
       {showAllMarkers ? (
         <LayersControl>
           {sortedData.map(({ name, type, markers }) => (
