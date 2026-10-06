@@ -6,7 +6,8 @@ English, simplified Chinese and traditional Chinese routes support direct marker
 
 ## Local development
 
-Use pnpm (the single committed dependency lockfile):
+Use Node.js 24 and pnpm (the single committed dependency lockfile). The runtime
+is pinned in `package.json` so Vercel builds and functions use a supported version:
 
 ```sh
 pnpm install --frozen-lockfile
@@ -15,7 +16,10 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-PostHog and AdSense are optional. Leave their keys empty for local work. AdSense
+PostHog uses the EU project configured in `app/providers.tsx` and runs only on
+`ninesolsmap.com` and `www.ninesolsmap.com`; local and preview visits are excluded.
+Its project token is public browser configuration. AdSense is optional; leave its
+publisher ID empty for local work. AdSense
 only loads when a full publisher ID is configured; this does not create a banner.
 The Supabase reader uses the anonymous key without forwarding browser cookies or
 sessions. Database policies must allow anonymous reads of `markers_chinese`.
