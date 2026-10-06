@@ -19,8 +19,8 @@ for (const locale of ['en','zh-CN','zh-TW']) {
     await expect(page.locator('.leaflet-marker-icon')).toHaveCount(4);
     const geometry = await page.evaluate(()=>{
       const map = document.querySelector('#map')?.getBoundingClientRect();
-      const title = document.querySelector('h1')?.getBoundingClientRect();
-      const support = document.querySelector('.support-link')?.getBoundingClientRect();
+      const title = document.querySelector('.map-title')?.getBoundingClientRect();
+      const support = document.querySelector('.map-header .support-link')?.getBoundingClientRect();
       return {width:innerWidth,height:innerHeight,scroll:document.documentElement.scrollWidth,
         mapBottom:map?.bottom,titleLeft:title?.left,supportRight:support?.right};
     });
@@ -28,6 +28,10 @@ for (const locale of ['en','zh-CN','zh-TW']) {
     expect(geometry.titleLeft).toBeGreaterThanOrEqual(0);
     expect(geometry.supportRight).toBeLessThanOrEqual(geometry.width);
     expect(geometry.mapBottom).toBeCloseTo(geometry.height,0);
+    await expect(page.locator('.map-header .support-link')).toBeVisible();
+    const support = await page.locator('.map-header .support-link').boundingBox();
+    if (!support) throw new Error('Header support control was not visible');
+    expect(support.height).toBeGreaterThanOrEqual(44);
     expect(icons.filter(path=>path.startsWith('/icons/'))).toEqual([]);
     expect(new Set(icons.filter(path=>path.startsWith('/sprites/'))).size).toBe(1);
     const spritePath = icons.find(path=>path.startsWith('/sprites/'));
@@ -47,11 +51,15 @@ for (const locale of ['en','zh-CN','zh-TW']) {
     await expect(page.locator('.leaflet-marker-icon')).toHaveCount(2);
     await page.keyboard.press('Escape');
     await expect(page.locator('.filter-dialog')).not.toBeVisible();
-    const help = locale === 'en' ? 'Help' : locale === 'zh-CN' ? '帮助' : '說明';
-    await page.getByRole('button',{name:help,exact:true}).tap();
-    await expect(page.locator('.help-dialog')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.locator('.help-dialog')).not.toBeVisible();
+    const about = locale === 'en' ? 'About' : locale === 'zh-CN' ? '关于' : '關於';
+    await page.getByRole('link',{name:about,exact:true}).tap();
+    await expect(page).toHaveURL(`/${locale}/about`);
+    await expect(page.locator('main h1')).toBeVisible();
+    await expect(page.locator('main')).toContainText('gtarraga');
+    await expect(page.locator('main a[href="https://github.com/gtarraga/ninesolsmap/issues"]')).toBeVisible();
+    await page.locator('.about-back a').tap();
+    await expect(page).toHaveURL(`/${locale}`);
+    await expect(page.locator('.leaflet-marker-icon')).toHaveCount(4);
   });
 }
 
@@ -117,4 +125,16 @@ test('failed load offers a working retry',async({page,request})=>{
   await request.get('http://127.0.0.1:3101/control/ok');
   await page.getByRole('button',{name:'Try again'}).tap();
   await expect(page.locator('.leaflet-marker-icon')).toHaveCount(4);
+});
+
+test('About is directly reachable and stays on About when switching language',async({page})=>{
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/en/about');
+  await expect(page).toHaveTitle('About this map · Nine Sols');
+  await expect(page.locator('main h1')).toHaveText('About this map');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(320);
+  await page.getByRole('combobox').tap();
+  await page.getByRole('option',{name:'繁體中文'}).tap();
+  await expect(page).toHaveURL('/zh-TW/about');
+  await expect(page.locator('main h1')).toHaveText('關於這張地圖');
 });
