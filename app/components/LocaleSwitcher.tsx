@@ -10,8 +10,8 @@ import {
 
 import { usePathname } from '@/lib/i18Navigation';
 import { useLocale } from 'next-intl';
-import { locales, Locale } from '@/i18n';
-import { useRouter } from 'next/navigation';
+import { locales, isLocale } from '@/lib/locales';
+import { useRouter } from '@/lib/i18Navigation';
 
 const languageName = {
   "en": "English",
@@ -22,15 +22,16 @@ const languageName = {
 export default function LocaleSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale() as Locale;
+  const requestedLocale = useLocale();
+  const locale = isLocale(requestedLocale) ? requestedLocale : 'en';
 
   const handleChange = (value: string) => {
-    router.replace(`/${value}/${pathname}`);
+    if (isLocale(value)) router.replace(pathname, {locale:value});
   };
 
   return (
     <Select defaultValue={locale} onValueChange={handleChange}>
-      <SelectTrigger className="w-[110px] border-transparent hover:border-black dark:hover:border-white rounded">
+      <SelectTrigger aria-label="Language / 語言" className="locale-select">
         <SelectValue placeholder="Select a language" />
       </SelectTrigger>
       <SelectContent className='bg-[#d6dbdc] dark:bg-black border-black'>

@@ -8,7 +8,6 @@
   "help-suggestion": "如果您對標記有任何建議或者修改意見，請與我們聯繫。",
   "help-link": "這裡有一份電子表格，您可以將意見添加至其中。",
   "copy-url": "複製 URL",
-
   "Root": "古树节点",
   "Chest": "宝箱",
   "Collectible": "收集道具",
@@ -28,10 +27,27 @@
   "DarkSteel": "玄铁",
   "Vial": "药瓶",
   "Hack": "骇入地点",
-
   "Metadata": {
     "title": "九日 互動式地圖",
     "description": "為了節省您在區域內尋找最後一個物品的時間。\n\n九日的互動地圖，包含所有物品、地圖芯片、頭目等！",
     "image": "/opengraph-image-tw.png"
-  }
+  },
+  "short-title": "九日",
+  "map-tools": "地圖工具",
+  "support": "支持",
+  "help": "說明",
+  "close": "關閉",
+  "loading": "正在載入地圖…",
+  "map-error": "無法載入地圖，請重試。",
+  "retry": "重試",
+  "filters": "篩選",
+  "show-all": "顯示所有標記",
+  "marker-missing": "找不到標記 · 顯示地圖",
+  "select-all": "顯示全部",
+  "hide-all": "隱藏全部",
+  "copied": "已複製",
+  "copy-error": "無法複製連結，請重試。",
+  "BigChest": "大型寶箱",
+  "Unknown": "未知",
+  "Yi": "羿"
 }

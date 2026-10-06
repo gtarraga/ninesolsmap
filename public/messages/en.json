@@ -8,7 +8,6 @@
   "help-suggestion": "If you have any suggestions or changes for markers,",
   "help-link": "here’s a spreadsheet you can add it to.",
   "copy-url": "Copy URL",
-  
   "Root": "Root Nodes",
   "Chest": "Chests",
   "Collectible": "Collectibles",
@@ -28,10 +27,27 @@
   "DarkSteel": "Dark Steel",
   "Vial": "Pipe Vials",
   "Hack": "Hack Points",
-
   "Metadata": {
     "title": "Nine Sols Interactive Map",
     "description": "To save you time finding that last item in an area.\n\nAn interactive map for Nine Sols with all items, map chips, bosses and more!",
     "image": "/opengraph-image.png"
-  }
+  },
+  "short-title": "Nine Sols",
+  "map-tools": "Map tools",
+  "support": "Support",
+  "help": "Help",
+  "close": "Close",
+  "loading": "Loading map…",
+  "map-error": "The map could not load. Please try again.",
+  "retry": "Try again",
+  "filters": "Filters",
+  "show-all": "Show all markers",
+  "marker-missing": "Marker not found · Show map",
+  "select-all": "Show all",
+  "hide-all": "Hide all",
+  "copied": "Copied",
+  "copy-error": "Could not copy the link. Please try again.",
+  "BigChest": "Large chests",
+  "Unknown": "Unknown",
+  "Yi": "Yi"
 }

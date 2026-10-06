@@ -1,21 +1,18 @@
-import { createClient } from "@/lib/supabase/supabase-server-side";
+import { loadPublicMarkers } from '@/lib/supabase/public-markers';
 
-export async function GET (
-    _req: Request,
-    { params }: { params: { data: string[] } }
-  ) {
-    try {
-        const supabase = createClient()
-        const { data, error } = await supabase.from("markers_chinese").select("*");
+/** Cache public HTTP successes rather than prerendering build-time upstream failures. */
+export const dynamic = 'force-dynamic';
 
-        if(error) {
-          console.log(error.message);
-          return new Response(`${error}`, { status: 500 });
-        }
-
-        return new Response(JSON.stringify(data), { status: 200 })
-
-    } catch (error) {
-        return new Response("Internal Server Error", { status: 500 });
-    }
+/** Serve the same anonymous map dataset to all callers, caching successful responses only. */
+export async function GET() {
+  const result = await loadPublicMarkers({url:process.env.NEXT_PUBLIC_SUPABASE_URL,
+    key:process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY});
+  if (result._tag === 'err') {
+    console.error('markers.read_failed',{stage:result.error.stage});
+    return Response.json({error:'Marker data is temporarily unavailable.'},{status:503,
+      headers:{'Cache-Control':'no-store'}});
+  }
+  return Response.json(result.value,{headers:{
+    'Cache-Control':'public, max-age=300, s-maxage=3600, stale-while-revalidate=3600',
+  }});
 }

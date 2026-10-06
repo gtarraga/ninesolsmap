@@ -1,45 +1,28 @@
-import { Popup } from "react-leaflet";
-import { DataItem } from "./Map"
-import {useTranslations} from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
+import { Popup } from 'react-leaflet';
+import { useTranslations } from 'next-intl';
+import { Share2 } from 'lucide-react';
+import type { MapMarker } from '@/lib/markers';
+import type { Locale } from '@/lib/locales';
 
-interface MarkerPopupProps {
-  marker: DataItem;
-  locale: string;
-}
-
-const language: Record<string, keyof DataItem> = {
-  'en': 'description',
-  'zh-TW': 'traditional',
-  'zh-CN': 'simplified',
-};
-
-const baseUrl = "https://ninesolsmap.com";
-
-
-export const MarkerPopup: React.FC<MarkerPopupProps> = ({marker, locale}) => {
+/** Show the localized description and report clipboard success or failure. */
+export function MarkerPopup({marker,locale}:{marker:MapMarker;locale:Locale}) {
   const t = useTranslations();
-  
-  return (
-    <Popup minWidth={200}>
-      <div className='min-w-12'>
-        <div className='py-2 text-[0.95rem]'>{marker[language[locale]]}</div>
-        
-        <hr className='py-1'/>
-
-        <div className="flex justify-between">
-          <div className="text-slate-400/70">id: <span className='italics text-xs'>{marker.id}</span></div>
-          
-          <button 
-            className={` share-button bg-emerald-300 hover:bg-emerald-400 text-slate-800 hover:text-slate-800 font-bold py-0.4 px-1 rounded inline-flex items-center justify-between`}
-            onClick={() => {
-                navigator.clipboard.writeText(`${baseUrl}/${locale}/${marker.id}`);
-              }}
-            >
-            <span className="text-xs pr-1">{t('copy-url')}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
-          </button>
-        </div>
-      </div>
-    </Popup>
-  )
+  const [copy,setCopy] = useState<'idle'|'copied'|'failed'>('idle');
+  const timer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(()=>()=>clearTimeout(timer.current),[]);
+  const description = locale === 'zh-CN' ? marker.simplified : locale === 'zh-TW' ? marker.traditional : marker.description;
+  const share = async () => {
+    try {
+      await navigator.clipboard.writeText(`https://ninesolsmap.com/${locale}/${encodeURIComponent(marker.id)}`);
+      setCopy('copied');
+    } catch { setCopy('failed'); }
+    clearTimeout(timer.current);
+    timer.current = setTimeout(()=>setCopy('idle'),2500);
+  };
+  return <Popup minWidth={200} maxWidth={280}>
+    <p className="marker-description">{description}</p>
+    <div className="popup-footer"><span className="marker-id">id: {marker.id}</span><button className="share-button" onClick={()=>void share()}><Share2 size={16} aria-hidden="true" /><span>{copy === 'copied' ? t('copied') : t('copy-url')}</span></button></div>
+    <span role="status" className={copy === 'failed' ? 'copy-error' : 'sr-only'}>{copy === 'failed' ? t('copy-error') : copy === 'copied' ? t('copied') : ''}</span>
+  </Popup>;
 }

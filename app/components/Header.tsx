@@ -1,19 +1,20 @@
-'use client'
-
-import { StyledKofiButton } from "./KofiButton"
-import HelpModal from "./HelpModal"
+'use client';
 import { useTranslations } from 'next-intl';
-import LocaleSwitcher from "./LocaleSwitcher";
+import { Heart } from 'lucide-react';
+import HelpModal from './HelpModal';
+import LocaleSwitcher from './LocaleSwitcher';
 
-export const Header = () => {
+/** Keep map tools readable at phone widths while preserving the donation link. */
+export function Header() {
   const t = useTranslations();
-  return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 justify-center">
-      <h2 className="flex-1 text-3xl">{t('title')}</h2>
-
+  return <header className="map-header">
+    <h1 className="map-title"><span className="hidden sm:inline">{t('title')}</span><span className="sm:hidden">{t('short-title')}</span></h1>
+    <nav className="header-tools" aria-label={t('map-tools')}>
       <LocaleSwitcher />
       <HelpModal />
-      <StyledKofiButton />
-    </header>
-  )
+      <a className="support-link" href="https://ko-fi.com/gtarraga" target="_blank" rel="noopener noreferrer" aria-label={t('kofi-button')} title={t('kofi-button')}>
+        <Heart size={18} aria-hidden="true" /><span className="hidden md:inline">{t('support')}</span>
+      </a>
+    </nav>
+  </header>;
 }
