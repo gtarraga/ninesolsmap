@@ -9,7 +9,8 @@ export function CSPostHogProvider({children}:{children:React.ReactNode}) {
     const isLiveSite = ['ninesolsmap.com', 'www.ninesolsmap.com'].includes(window.location.hostname);
     if (!isLiveSite || posthog.__loaded) return;
     posthog.init('phc_vqdisUw3HGLh6ZmLWjR56DbSJCgup5pCbZXq5JeqA4bN', {
-      api_host: 'https://eu.i.posthog.com',
+      api_host: 'https://e.ninesolsmap.com',
+      ui_host: 'https://eu.posthog.com',
       defaults: '2026-05-30',
       person_profiles: 'identified_only',
     });

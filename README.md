@@ -18,7 +18,12 @@ pnpm dev
 
 PostHog uses the EU project configured in `app/providers.tsx` and runs only on
 `ninesolsmap.com` and `www.ninesolsmap.com`; local and preview visits are excluded.
-Its project token is public browser configuration. AdSense is optional; leave its
+Its project token is public browser configuration. Analytics requests use the
+PostHog-managed `e.ninesolsmap.com` proxy, so they do not consume Vercel request
+quota. Cloudflare has a DNS-only CNAME record:
+`e` → `db17682af2d47c668012.cf-prod-eu-proxy.europehog.com`.
+PostHog verified the proxy and its HTTPS certificate on 2026-10-06.
+The proxy does not change analytics consent or cookieless settings. AdSense is optional; leave its
 publisher ID empty for local work. AdSense
 only loads when a full publisher ID is configured; this does not create a banner.
 The Supabase reader uses the anonymous key without forwarding browser cookies or
