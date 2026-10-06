@@ -10,8 +10,14 @@ import {
 
 import { usePathname } from '@/lib/i18Navigation';
 import { useLocale } from 'next-intl';
-import { locales, Locale } from '@/i18n';
-import { useRouter } from 'next/navigation';
+import { locales, isLocale } from '@/lib/locales';
+import { useRouter } from '@/lib/i18Navigation';
+
+const languageLabel = {
+  en: "EN",
+  "zh-CN": "简体",
+  "zh-TW": "繁體",
+};
 
 const languageName = {
   "en": "English",
@@ -19,23 +25,25 @@ const languageName = {
   "zh-CN": "简体中文"
 }
 
+/** Compact language menu; full language names remain visible in the dropdown. */
 export default function LocaleSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale() as Locale;
+  const requestedLocale = useLocale();
+  const locale = isLocale(requestedLocale) ? requestedLocale : 'en';
 
   const handleChange = (value: string) => {
-    router.replace(`/${value}/${pathname}`);
+    if (isLocale(value)) router.replace(pathname, {locale:value});
   };
 
   return (
     <Select defaultValue={locale} onValueChange={handleChange}>
-      <SelectTrigger className="w-[110px] border-transparent hover:border-black dark:hover:border-white rounded">
-        <SelectValue placeholder="Select a language" />
+      <SelectTrigger aria-label={`Language / 語言: ${languageName[locale]}`} title={languageName[locale]} className="locale-select">
+        <SelectValue>{languageLabel[locale]}</SelectValue>
       </SelectTrigger>
-      <SelectContent className='bg-[#d6dbdc] dark:bg-black border-black'>
+      <SelectContent className="language-menu">
         {locales.map((elt) => (
-          <SelectItem key={elt} value={elt} className='hover:bg-gray-400 dark:hover:bg-gray-600'>
+          <SelectItem key={elt} value={elt} className="language-option">
             {languageName[elt]}
           </SelectItem>
         ))}

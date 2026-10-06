@@ -6,27 +6,28 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "icons:generate": "node scripts/generate-sprite.mjs",
+    "prebuild": "node scripts/generate-sprite.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.0.0",
-    "@supabase/ssr": "^0.3.0",
     "clsx": "^2.1.1",
-    "kofi-button": "^1.1.1",
     "leaflet": "^1.9.4",
-    "leaflet-defaulticon-compatibility": "^0.1.2",
     "lucide-react": "^0.395.0",
     "next": "14.2.35",
     "next-intl": "^3.15.0",
-    "posthog-js": "^1.215.1",
+    "posthog-js": "^1.436.1",
     "react": "^18",
     "react-dom": "^18",
     "react-leaflet": "^4.2.1",
-    "react-leaflet-cluster": "^2.1.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -34,7 +35,12 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": "24.x"
   }
 }

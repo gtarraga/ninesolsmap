@@ -1,0 +1,38 @@
+[
+  {
+    "id": "boss-one",
+    "x": -0.0972900390625,
+    "y": 0.443359375,
+    "type": "Boss",
+    "description": "First boss",
+    "traditional": "第一位頭目",
+    "simplified": "第一位头目"
+  },
+  {
+    "id": "boss-two",
+    "x": -0.1,
+    "y": 0.45,
+    "type": "boss",
+    "description": "Second boss",
+    "traditional": "第二位頭目",
+    "simplified": "第二位头目"
+  },
+  {
+    "id": "chest-one",
+    "x": -0.11,
+    "y": 0.44,
+    "type": "Collectible",
+    "description": "Basic component chest",
+    "traditional": null,
+    "simplified": null
+  },
+  {
+    "id": "unknown-one",
+    "x": -0.12,
+    "y": 0.46,
+    "type": "constructor",
+    "description": "Future item",
+    "traditional": "未來道具",
+    "simplified": "未来道具"
+  }
+]
