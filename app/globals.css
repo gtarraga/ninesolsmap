@@ -75,3 +75,20 @@ dialog::backdrop { background:rgba(2,11,19,.5); }
 .about-content p { margin:0 0 12px; }
 .about-content a { display:inline-flex; align-items:center; min-height:44px; text-decoration:underline; text-underline-offset:4px; }
 .about-back { margin-top:24px; }
+
+.about-links { display:flex; flex-wrap:wrap; column-gap:24px; row-gap:4px; margin-top:24px; padding-top:16px; border-top:1px solid var(--line); }
+.page-meta,.location-ref { color:var(--muted); font-size:13px; }
+.locations-content { max-width:800px; }
+.category-links { display:flex; flex-wrap:wrap; gap:8px; margin:24px 0; }
+.category-links a { padding:8px 12px; border:1px solid var(--line); border-radius:8px; gap:8px; font-size:14px; text-decoration:none; }
+.category-links span { color:var(--muted); }
+.location-list { list-style:none; padding:0; margin:0; }
+.location-list li { border-bottom:1px solid var(--line); }
+.location-list a { display:block; padding:16px 0; text-decoration:none; white-space:pre-line; overflow-wrap:anywhere; }
+.location-list a:hover { text-decoration:underline; }
+.location-ref { display:block; padding-top:4px; }
+.location-summary { flex:none; background:var(--panel); border-bottom:1px solid var(--line); padding:8px 16px; max-height:30dvh; overflow:auto; }
+.location-summary summary { cursor:pointer; font-weight:600; min-height:36px; padding:6px 0; }
+.location-summary-content { display:flex; flex-wrap:wrap; align-items:center; gap:4px 20px; }
+.location-summary-content p { margin:0; white-space:pre-line; flex:1 1 240px; }
+.location-summary-content a { display:inline-flex; align-items:center; min-height:44px; text-decoration:underline; font-size:13px; }
