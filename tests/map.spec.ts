@@ -138,3 +138,30 @@ test('About is directly reachable and stays on About when switching language',as
   await expect(page).toHaveURL('/zh-TW/about');
   await expect(page.locator('main h1')).toHaveText('關於這張地圖');
 });
+
+test('Privacy is linked from About and follows the selected language',async({page})=>{
+  for (const locale of ['en','zh-CN','zh-TW']) {
+    await page.goto(`/${locale}/about`);
+    await page.locator(`a[href="/${locale}/privacy"]`).click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/privacy$`));
+    await expect(page.locator('main h1')).toBeVisible();
+    await expect(page.locator('main section')).toHaveCount(4);
+    await expect(page.locator('ins.adsbygoogle,[aria-label="Advertisement preview"]')).toHaveCount(0);
+  }
+});
+
+test('location notes and directory links are present without JavaScript',async({browser,request})=>{
+  const context = await browser.newContext({javaScriptEnabled:false});
+  const page = await context.newPage();
+  await page.goto('http://localhost:3100/en/locations');
+  await expect(page.locator('a[href="/en/chest-one"]')).toBeVisible();
+  await page.locator('a[href="/en/chest-one"]').click();
+  await expect(page.locator('.location-summary-content p')).toHaveText('Basic component chest');
+  await expect(page.locator('.location-summary a')).toHaveAttribute('href','/en/locations');
+  const sitemap = await request.get('/sitemap.xml');
+  expect(sitemap.status()).toBe(200);
+  expect(await sitemap.text()).toContain('https://ninesolsmap.com/en/chest-one');
+  const robots = await request.get('/robots.txt');
+  expect(await robots.text()).toContain('Allow: /');
+  await context.close();
+});

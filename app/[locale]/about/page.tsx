@@ -28,6 +28,7 @@ export default async function AboutPage({params:{locale}}:{params:{locale:string
       <h2>{t('about-support-title')}</h2>
       <p>{t('about-support')}</p>
       <a href="https://ko-fi.com/gtarraga">{t('kofi-button')}</a>
+      <nav className="about-links" aria-label={t('about')}><Link href={`/${locale}/locations`}>{t('locations')}</Link><Link href={`/${locale}/privacy`}>{t('privacy')}</Link></nav>
       <div className="about-back"><Link href={`/${locale}`}>← {t('back-to-map')}</Link></div>
     </article>
   </main>;
