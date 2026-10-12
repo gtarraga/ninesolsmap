@@ -1,5 +1,21 @@
 import { test, expect } from '@playwright/test';
 
+test('localized home and About URLs declare their canonical without query parameters',async({request})=>{
+  for (const locale of ['en','zh-CN','zh-TW']) for (const path of ['', '/about']) {
+    const response = await request.get(`/${locale}${path}?source=shared`);
+    expect(response.status()).toBe(200);
+    expect(await response.text()).toContain(`<link rel="canonical" href="https://ninesolsmap.com/${locale}${path}"`);
+  }
+});
+
+test('malformed Search Console URLs resolve to a real non-indexable 404',async({request})=>{
+  for (const path of ['/en/en%3Cbr%3E%EB%A7%B5','/enhttps://ninesolsmap.com/zh-TW/loF1GA9GCQ6F']) {
+    const response = await request.get(path);
+    expect(response.status()).toBe(404);
+    expect(await response.text()).toContain('<meta name="robots" content="noindex"');
+  }
+});
+
 const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64');
 
 test.beforeEach(async ({page,request})=>{
