@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { isLocale } from '@/lib/locales';
+import { isLocale, locales } from '@/lib/locales';
 
 /** Give the public About route its own localized search and sharing metadata. */
 export async function generateMetadata({params:{locale}}:{params:{locale:string}}) {
@@ -9,6 +9,8 @@ export async function generateMetadata({params:{locale}}:{params:{locale:string}
   const t = await getTranslations({locale});
   const title = `${t('about-title')} · ${t('short-title')}`;
   return {title, description:t('about-description'),
+    alternates:{canonical:`/${locale}/about`,
+      languages:Object.fromEntries(locales.map(language=>[language,`/${language}/about`]))},
     openGraph:{title, description:t('about-description'), url:`/${locale}/about`}};
 }
 
