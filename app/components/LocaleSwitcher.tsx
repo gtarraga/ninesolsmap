@@ -10,8 +10,8 @@ import {
 
 import { usePathname } from '@/lib/i18Navigation';
 import { useLocale } from 'next-intl';
-import { locales, isLocale } from '@/lib/locales';
-import { useRouter } from '@/lib/i18Navigation';
+import { locales, isLocale, localePath } from '@/lib/locales';
+import { useRouter } from 'next/navigation';
 
 const languageLabel = {
   en: "EN",
@@ -33,7 +33,7 @@ export default function LocaleSwitcher() {
   const locale = isLocale(requestedLocale) ? requestedLocale : 'en';
 
   const handleChange = (value: string) => {
-    if (isLocale(value)) router.replace(pathname, {locale:value});
+    if (isLocale(value)) router.replace(localePath(value,pathname));
   };
 
   return (

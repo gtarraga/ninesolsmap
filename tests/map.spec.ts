@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test('localized home and About URLs declare their canonical without query parameters',async({request})=>{
-  for (const locale of ['en','zh-CN','zh-TW']) for (const path of ['', '/about']) {
-    const response = await request.get(`/${locale}${path}?source=shared`);
+  for (const locale of ['en','zh-CN','zh-TW']) for (const path of ['', '/about', '/privacy', '/locations', '/chest-one']) {
+    const response = await request.get(`${locale === 'en' ? path || '/' : `/${locale}${path}`}?source=shared`);
     expect(response.status()).toBe(200);
-    expect(await response.text()).toContain(`<link rel="canonical" href="https://ninesolsmap.com/${locale}${path}"`);
+    const canonical = (await response.text()).match(/<link rel="canonical" href="([^"]+)"/);
+    expect(canonical).not.toBeNull();
+    expect(new URL(canonical?.[1] ?? 'https://missing.invalid').href).toBe(new URL(locale === 'en' ? path || '/' : `/${locale}${path}`,'https://ninesolsmap.com').href);
   }
 });
 
@@ -31,7 +33,7 @@ for (const locale of ['en','zh-CN','zh-TW']) {
       const path = new URL(request.url()).pathname;
       if (path.startsWith('/icons/') || path.startsWith('/sprites/')) icons.push(path);
     });
-    await page.goto(`/${locale}`);
+    await page.goto(locale === 'en' ? '/' : `/${locale}`);
     await expect(page.locator('.leaflet-marker-icon')).toHaveCount(4);
     const geometry = await page.evaluate(()=>{
       const map = document.querySelector('#map')?.getBoundingClientRect();
@@ -69,12 +71,12 @@ for (const locale of ['en','zh-CN','zh-TW']) {
     await expect(page.locator('.filter-dialog')).not.toBeVisible();
     const about = locale === 'en' ? 'About' : locale === 'zh-CN' ? '关于' : '關於';
     await page.getByRole('link',{name:about,exact:true}).tap();
-    await expect(page).toHaveURL(`/${locale}/about`);
+    await expect(page).toHaveURL(`${locale === 'en' ? '' : `/${locale}`}/about`);
     await expect(page.locator('main h1')).toBeVisible();
     await expect(page.locator('main')).toContainText('gtarraga');
     await expect(page.locator('main a[href="https://github.com/gtarraga/ninesolsmap/issues"]')).toBeVisible();
     await page.locator('.about-back a').tap();
-    await expect(page).toHaveURL(`/${locale}`);
+    await expect(page).toHaveURL(locale === 'en' ? '/' : `/${locale}`);
     await expect(page.locator('.leaflet-marker-icon')).toHaveCount(4);
   });
 }
@@ -110,7 +112,7 @@ test('320px and phone landscape stay within the viewport',async({page})=>{
 });
 
 test('language change keeps a shared marker URL',async({page})=>{
-  await page.goto('/en/boss-one');
+  await page.goto('/boss-one');
   await expect(page.locator('.leaflet-popup')).toBeVisible();
   await page.getByRole('combobox').tap();
   await page.getByRole('option',{name:'繁體中文'}).tap();
@@ -136,7 +138,7 @@ test('API ignores session cookies and caches only valid successful data',async({
 
 test('failed load offers a working retry',async({page,request})=>{
   await request.get('http://127.0.0.1:3101/control/error');
-  await page.goto('/en');
+  await page.goto('/');
   await expect(page.locator('.map-status[role="alert"]')).toContainText('The map could not load');
   await request.get('http://127.0.0.1:3101/control/ok');
   await page.getByRole('button',{name:'Try again'}).tap();
@@ -145,7 +147,7 @@ test('failed load offers a working retry',async({page,request})=>{
 
 test('About is directly reachable and stays on About when switching language',async({page})=>{
   await page.setViewportSize({width:320,height:568});
-  await page.goto('/en/about');
+  await page.goto('/about');
   await expect(page).toHaveTitle('About this map · Nine Sols');
   await expect(page.locator('main h1')).toHaveText('About this map');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(320);
@@ -157,9 +159,9 @@ test('About is directly reachable and stays on About when switching language',as
 
 test('Privacy is linked from About and follows the selected language',async({page})=>{
   for (const locale of ['en','zh-CN','zh-TW']) {
-    await page.goto(`/${locale}/about`);
-    await page.locator(`a[href="/${locale}/privacy"]`).click();
-    await expect(page).toHaveURL(new RegExp(`/${locale}/privacy$`));
+    await page.goto(`${locale === 'en' ? '' : `/${locale}`}/about`);
+    await page.locator(`a[href="${locale === 'en' ? '' : `/${locale}`}/privacy"]`).click();
+    await expect(page).toHaveURL(new RegExp(`${locale === 'en' ? '' : `/${locale}`}/privacy$`));
     await expect(page.locator('main h1')).toBeVisible();
     await expect(page.locator('main section')).toHaveCount(4);
     await expect(page.locator('ins.adsbygoogle,[aria-label="Advertisement preview"]')).toHaveCount(0);
@@ -169,15 +171,49 @@ test('Privacy is linked from About and follows the selected language',async({pag
 test('location notes and directory links are present without JavaScript',async({browser,request})=>{
   const context = await browser.newContext({javaScriptEnabled:false});
   const page = await context.newPage();
-  await page.goto('http://localhost:3100/en/locations');
-  await expect(page.locator('a[href="/en/chest-one"]')).toBeVisible();
-  await page.locator('a[href="/en/chest-one"]').click();
+  await page.goto('http://localhost:3100/locations');
+  await expect(page.locator('a[href="/chest-one"]')).toBeVisible();
+  await page.locator('a[href="/chest-one"]').click();
   await expect(page.locator('.location-summary-content p')).toHaveText('Basic component chest');
-  await expect(page.locator('.location-summary a')).toHaveAttribute('href','/en/locations');
+  await expect(page.locator('.location-summary a')).toHaveAttribute('href','/locations');
   const sitemap = await request.get('/sitemap.xml');
   expect(sitemap.status()).toBe(200);
-  expect(await sitemap.text()).toContain('https://ninesolsmap.com/en/chest-one');
+  expect(await sitemap.text()).toContain('https://ninesolsmap.com/chest-one');
   const robots = await request.get('/robots.txt');
   expect(await robots.text()).toContain('Allow: /');
   await context.close();
+});
+
+
+test('root stays English and old English URLs permanently redirect with their query',async({request,page,context})=>{
+  await context.grantPermissions(['clipboard-read','clipboard-write']);
+  const root = await request.get('/',{maxRedirects:0,headers:{'Accept-Language':'zh-TW',Cookie:'NEXT_LOCALE=zh-TW'}});
+  expect(root.status()).toBe(200);
+  expect(await root.text()).toContain('<html lang="en">');
+  for (const [oldPath,newPath] of [['/en','/'],['/en/about','/about'],['/en/privacy','/privacy'],['/en/chest-one','/chest-one']]) {
+    const response = await request.get(`${oldPath}?source=share`,{maxRedirects:0});
+    expect(response.status()).toBe(308);
+    expect(new URL(response.headers().location,'http://localhost:3100').pathname).toBe(newPath);
+    expect(new URL(response.headers().location,'http://localhost:3100').search).toBe('?source=share');
+  }
+  await page.goto('/chest-one');
+  await expect(page.locator('.leaflet-popup')).toBeVisible();
+  await page.getByRole('combobox').tap();
+  await page.getByRole('option',{name:'繁體中文'}).tap();
+  await expect(page).toHaveURL('/zh-TW/chest-one');
+  await page.getByRole('combobox').tap();
+  await page.getByRole('option',{name:'English'}).tap();
+  await expect(page).toHaveURL('/chest-one');
+  await page.getByRole('button',{name:'Copy URL'}).tap();
+  expect(await page.evaluate(()=>navigator.clipboard.readText())).toBe('https://ninesolsmap.com/chest-one');
+});
+
+test('sitemap contains canonical root English URLs and preserves both Chinese versions',async({request})=>{
+  const response = await request.get('/sitemap.xml');
+  const xml = await response.text();
+  expect(xml).toContain('<loc>https://ninesolsmap.com/</loc>');
+  expect(xml).toContain('<loc>https://ninesolsmap.com/chest-one</loc>');
+  expect(xml).toContain('<loc>https://ninesolsmap.com/zh-CN/chest-one</loc>');
+  expect(xml).toContain('<loc>https://ninesolsmap.com/zh-TW/chest-one</loc>');
+  expect(xml).not.toContain('https://ninesolsmap.com/en');
 });

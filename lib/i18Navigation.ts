@@ -1,8 +1,6 @@
 import { createSharedPathnamesNavigation } from 'next-intl/navigation';
 
-import { locales } from './locales';
+import { routing } from './routing';
 
 /** Locale-aware navigation that preserves marker sharing paths. */
-export const { usePathname, useRouter } = createSharedPathnamesNavigation({
-  locales: locales,
-});
+export const { usePathname } = createSharedPathnamesNavigation(routing);

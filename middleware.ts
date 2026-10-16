@@ -1,12 +1,10 @@
 import createMiddleware from 'next-intl/middleware';
+import { routing } from './lib/routing';
  
-export default createMiddleware({
-  locales: ['en', 'zh-TW', 'zh-CN'],
-  defaultLocale: 'en'
-});
+export default createMiddleware(routing);
 
 // This matches all urls except api, _next, _vercel and the ones that contain a dot. 
-// It will redirect all the others to the default locale
+// Unprefixed pages are internally rewritten to English without a browser redirect.
 export const config = {
   matcher: [
     '/((?!api|_next|_vercel|.*\\..*).*)',

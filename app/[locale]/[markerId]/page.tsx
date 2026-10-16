@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { MapView } from '@/app/components/MapView';
-import { isLocale } from '@/lib/locales';
+import { isLocale, localePath, pageAlternates } from '@/lib/locales';
 import { getCategoryTranslationKey } from '@/lib/markers';
 import { markerDescription, readPageMarkers } from '@/lib/page-markers';
 
@@ -19,7 +19,7 @@ export async function generateMetadata({params:{locale,markerId}}:{params:RouteP
   const t = await getTranslations({locale});
   const description = marker ? markerDescription(marker,locale) : t('location-unavailable');
   return {title:`${description.slice(0,90)} · ${t('short-title')}`,description,
-    alternates:{canonical:`/${locale}/${encodeURIComponent(markerId)}`},
+    alternates:pageAlternates(locale,`/${encodeURIComponent(markerId)}`),
     openGraph:{title:description.slice(0,90),description}};
 }
 
@@ -37,7 +37,7 @@ export default async function MapPage({params:{locale,markerId}}:{params:RoutePa
       <summary>{t('location-title',{category})}</summary>
       <div className="location-summary-content">
         <p>{marker ? markerDescription(marker,locale).trim() || t('location-empty') : t('location-unavailable')}</p>
-        <Link href={`/${locale}/locations`}>{t('locations-back')}</Link>
+        <Link href={localePath(locale,'/locations')}>{t('locations-back')}</Link>
       </div>
     </details>
     <main className="map-main"><MapView markerId={markerId} /></main>
