@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { isLocale } from '@/lib/locales';
+import { isLocale, localePath, pageAlternates } from '@/lib/locales';
 import { getCategoryTranslationKey, type MapMarker } from '@/lib/markers';
 import { markerDescription, readPageMarkers } from '@/lib/page-markers';
 
@@ -13,7 +13,7 @@ export async function generateMetadata({params:{locale}}:{params:{locale:string}
   if (!isLocale(locale)) notFound();
   const t = await getTranslations({locale});
   return {title:`${t('locations-title')} · ${t('short-title')}`,description:t('locations-intro'),
-    alternates:{canonical:`/${locale}/locations`}};
+    alternates:pageAlternates(locale,'/locations')};
 }
 
 /** Expose existing curated location notes and map links without requiring JavaScript. */
@@ -39,13 +39,13 @@ export default async function LocationsPage({params:{locale}}:{params:{locale:st
       {categories.map(([type,markers]) => <section key={type} id={type}>
         <h2>{categoryName(type)} <span className="page-meta">{markers.length}</span></h2>
         <ul className="location-list">{markers.map(marker => <li key={marker.id}>
-          <Link href={`/${locale}/${encodeURIComponent(marker.id)}`}>
+          <Link href={localePath(locale,`/${encodeURIComponent(marker.id)}`)}>
             {markerDescription(marker,locale).trim() || t('location-empty')}
             <span className="location-ref">{t('location-reference',{id:marker.id})}</span>
           </Link>
         </li>)}</ul>
       </section>)}
     </>}
-    <nav className="about-links"><Link href={`/${locale}/about`}>{t('about')}</Link><Link href={`/${locale}/privacy`}>{t('privacy')}</Link><Link href={`/${locale}`}>{t('back-to-map')}</Link></nav>
+    <nav className="about-links"><Link href={localePath(locale,'/about')}>{t('about')}</Link><Link href={localePath(locale,'/privacy')}>{t('privacy')}</Link><Link href={localePath(locale)}>{t('back-to-map')}</Link></nav>
   </article></main>;
 }

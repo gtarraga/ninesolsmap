@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { isLocale, locales } from '@/lib/locales';
+import { isLocale, localePath, pageAlternates } from '@/lib/locales';
 
 /** Give the public About route its own localized search and sharing metadata. */
 export async function generateMetadata({params:{locale}}:{params:{locale:string}}) {
@@ -9,9 +9,8 @@ export async function generateMetadata({params:{locale}}:{params:{locale:string}
   const t = await getTranslations({locale});
   const title = `${t('about-title')} · ${t('short-title')}`;
   return {title, description:t('about-description'),
-    alternates:{canonical:`/${locale}/about`,
-      languages:Object.fromEntries(locales.map(language=>[language,`/${language}/about`]))},
-    openGraph:{title, description:t('about-description'), url:`/${locale}/about`}};
+    alternates:pageAlternates(locale,'/about'),
+    openGraph:{title, description:t('about-description'), url:localePath(locale,'/about')}};
 }
 
 /** Concise project information and usage guidance, readable without loading the map. */
@@ -30,8 +29,8 @@ export default async function AboutPage({params:{locale}}:{params:{locale:string
       <h2>{t('about-support-title')}</h2>
       <p>{t('about-support')}</p>
       <a href="https://ko-fi.com/gtarraga">{t('kofi-button')}</a>
-      <nav className="about-links" aria-label={t('about')}><Link href={`/${locale}/locations`}>{t('locations')}</Link><Link href={`/${locale}/privacy`}>{t('privacy')}</Link></nav>
-      <div className="about-back"><Link href={`/${locale}`}>← {t('back-to-map')}</Link></div>
+      <nav className="about-links" aria-label={t('about')}><Link href={localePath(locale,'/locations')}>{t('locations')}</Link><Link href={localePath(locale,'/privacy')}>{t('privacy')}</Link></nav>
+      <div className="about-back"><Link href={localePath(locale)}>← {t('back-to-map')}</Link></div>
     </article>
   </main>;
 }

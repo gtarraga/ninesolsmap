@@ -3,7 +3,7 @@ import { Popup } from 'react-leaflet';
 import { useTranslations } from 'next-intl';
 import { Share2 } from 'lucide-react';
 import type { MapMarker } from '@/lib/markers';
-import type { Locale } from '@/lib/locales';
+import { localePath, type Locale } from '@/lib/locales';
 
 /** Show the localized description and report clipboard success or failure. */
 export function MarkerPopup({marker,locale}:{marker:MapMarker;locale:Locale}) {
@@ -14,7 +14,7 @@ export function MarkerPopup({marker,locale}:{marker:MapMarker;locale:Locale}) {
   const description = locale === 'zh-CN' ? marker.simplified : locale === 'zh-TW' ? marker.traditional : marker.description;
   const share = async () => {
     try {
-      await navigator.clipboard.writeText(`https://ninesolsmap.com/${locale}/${encodeURIComponent(marker.id)}`);
+      await navigator.clipboard.writeText(`https://ninesolsmap.com${localePath(locale,`/${encodeURIComponent(marker.id)}`)}`);
       setCopy('copied');
     } catch { setCopy('failed'); }
     clearTimeout(timer.current);
