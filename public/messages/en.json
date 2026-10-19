@@ -76,5 +76,6 @@
   "location-unavailable": "Location notes are temporarily unavailable. You can still try loading the map.",
   "location-empty": "No additional note has been added for this location.",
   "location-reference": "Marker reference: {id}",
-  "locations-back": "All locations"
+  "locations-back": "All locations",
+  "hide-ad-until-reload": "Hide ad until reload"
 }

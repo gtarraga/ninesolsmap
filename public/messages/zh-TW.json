@@ -76,5 +76,6 @@
   "location-unavailable": "地點備註暫時無法載入，您仍可嘗試開啟地圖。",
   "location-empty": "此地點暫無其他備註。",
   "location-reference": "標記編號：{id}",
-  "locations-back": "所有地點"
+  "locations-back": "所有地點",
+  "hide-ad-until-reload": "隱藏廣告（重新整理後恢復）"
 }

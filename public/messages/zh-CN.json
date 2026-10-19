@@ -76,5 +76,6 @@
   "location-unavailable": "地点备注暂时无法加载，您仍可尝试打开地图。",
   "location-empty": "此地点暂无其他备注。",
   "location-reference": "标记编号：{id}",
-  "locations-back": "所有地点"
+  "locations-back": "所有地点",
+  "hide-ad-until-reload": "隐藏广告（刷新后恢复）"
 }

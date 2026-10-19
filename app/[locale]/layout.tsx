@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation';
 import { isLocale } from '@/lib/locales';
 import { openGraphImages } from '@/lib/opengraphImages';
 import AdSense from '../components/AdSense';
+import { AdSenseLocalPreview } from '@/app/components/AdSenseLocalPreview';
 
 const inter = Inter({ subsets:['latin'] });
 
@@ -27,12 +28,13 @@ export default async function LocaleLayout({children,params:{locale}}:
   {children:React.ReactNode;params:{locale:string}}) {
   if (!isLocale(locale)) notFound();
   const messages = await getMessages();
+  const adPreview = process.env.ADSENSE_LOCAL_PREVIEW === '1';
   return <html lang={locale}>
     <body className={inter.className}>
       <CSPostHogProvider>
-        <AdSense pId={process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID} />
+        {!adPreview && <AdSense pId={process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID} />}
         <NextIntlClientProvider messages={messages}>
-          <div className="app-shell"><Header />{children}</div>
+          <div className="app-shell"><Header />{adPreview ? <AdSenseLocalPreview>{children}</AdSenseLocalPreview> : children}</div>
         </NextIntlClientProvider>
       </CSPostHogProvider>
     </body>
