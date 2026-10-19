@@ -131,15 +131,32 @@ export function AdBanner({children,preview}:{children:ReactNode;preview:boolean}
   const pathname = usePathname();
   const [allowed,setAllowed] = useState(false);
   const [dismissed,setDismissed] = useState(false);
+  const [enabled,setEnabled] = useState(false);
   useEffect(()=>{
     const hosts = preview ? ['localhost','127.0.0.1','[::1]'] : ['ninesolsmap.com','www.ninesolsmap.com'];
     setAllowed(hosts.includes(window.location.hostname));
   },[preview]);
+  useEffect(()=>{
+    if (preview) { setEnabled(true);return; }
+    if (!allowed) return;
+    // Ignore a synchronous cached result; wait for this page's fresh response.
+    let subscribing = true;
+    const unsubscribe = posthog.onFeatureFlags((_flags,_variants,context)=>{
+      if (subscribing) return;
+      setEnabled(!context?.errorsLoading && posthog.isFeatureEnabled('ad-banner-enabled') === true);
+    });
+    subscribing = false;
+    const refresh = () => posthog.reloadFeatureFlags();
+    refresh();
+    const timer = window.setInterval(refresh,60000);
+    window.addEventListener('focus',refresh);
+    return ()=>{ unsubscribe();window.clearInterval(timer);window.removeEventListener('focus',refresh); };
+  },[allowed,preview]);
   const dismiss = () => {
     setDismissed(true);
   };
   const parts = pathname.split('/').filter(Boolean);
   const page = parts[0] === 'zh-CN' || parts[0] === 'zh-TW' ? parts.slice(1) : parts;
   const map = page.length <= 1 && !['about','privacy','locations'].includes(page[0]);
-  return <>{children}{allowed && map && !dismissed ? <ResponsiveUnit key={pathname} preview={preview} onDismiss={dismiss} /> : null}</>;
+  return <>{children}{allowed && enabled && map && !dismissed ? <ResponsiveUnit key={pathname} preview={preview} onDismiss={dismiss} /> : null}</>;
 }
