@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { gunzipSync } from 'node:zlib';
 
 test.skip(process.env.VERCEL_ENV !== 'production' || process.env.ADSENSE_LOCAL_PREVIEW === '1','Runs only when testing production banner wiring.');
 
@@ -12,13 +13,20 @@ test('production domain gets live ad mode and reload restores the closed banner'
   });
   await page.route('https://map.ninesolsmap.com/**',route=>route.abort());
   let flagEnabled = true;
-  await page.route('https://e.ninesolsmap.com/**',route=>route.request().url().includes('/flags/') ? route.fulfill({
-    contentType:'application/json',body:JSON.stringify({featureFlags:{'ad-banner-enabled':flagEnabled},featureFlagPayloads:{}}),
-  }) : route.abort());
+  await page.route('https://e.ninesolsmap.com/**',route=>{
+    if (!route.request().url().includes('/flags/')) return route.abort();
+    const buffer = route.request().postDataBuffer();
+    const raw = buffer ? (buffer[0] === 0x1f ? gunzipSync(buffer) : buffer).toString('utf8') : '{}';
+    const encoded = new URLSearchParams(raw).get('data');
+    const data = JSON.parse(encoded ? Buffer.from(encoded,'base64').toString('utf8') : raw);
+    return route.fulfill({contentType:'application/json',body:JSON.stringify({
+      featureFlags:{'ad-banner-enabled':flagEnabled && data.person_properties?.ad_banner_tester === true},featureFlagPayloads:{},
+    })});
+  });
   await page.route('https://pagead2.googlesyndication.com/pagead/js/**',route=>route.fulfill({
     contentType:'application/javascript',body:`window.adsbygoogle={push(){document.querySelector('ins.adsbygoogle').dataset.adStatus='filled';}};`,
   }));
-  await page.goto('https://ninesolsmap.com/');
+  await page.goto('https://ninesolsmap.com/?ads-test=on');
   const banner = page.getByRole('region',{name:'Advertisement',exact:true});
   await expect(banner).toBeVisible();
   await expect(banner.locator('ins')).toHaveAttribute('data-ad-status','filled');

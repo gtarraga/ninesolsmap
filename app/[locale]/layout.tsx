@@ -28,7 +28,7 @@ export default async function LocaleLayout({children,params:{locale}}:
   {children:React.ReactNode;params:{locale:string}}) {
   if (!isLocale(locale)) notFound();
   const messages = await getMessages();
-  const adPreview = process.env.ADSENSE_LOCAL_PREVIEW === '1';
+  const adPreview = process.env.ADSENSE_LOCAL_PREVIEW === '1' || process.env.VERCEL_ENV === 'preview';
   const adBanner = adPreview || process.env.VERCEL_ENV === 'production';
   return <html lang={locale}>
     <body className={inter.className}>
