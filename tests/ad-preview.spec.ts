@@ -31,7 +31,7 @@ test('close records one event, frees the map, and resets on reload without cooki
   await close.click();
   await expect(page.locator('.local-ad-preview')).toHaveCount(0);
   const events = await page.evaluate(()=>Reflect.get(window,'adPreviewEvents'));
-  const common = {ad_slot:'9790698796',ad_layout:'mobile',ad_request_id:expect.any(String),ms_since_request:expect.any(Number)};
+  const common = {ad_variant:'custom',ad_slot:'9790698796',ad_layout:'mobile',ad_request_id:expect.any(String),ms_since_request:expect.any(Number)};
   expect(events).toEqual([
     {event:'ad_banner_requested',properties:{...common,ad_status:'pending',was_shown:false}},
     {event:'ad_banner_result',properties:{...common,ad_status:'filled',was_shown:false}},

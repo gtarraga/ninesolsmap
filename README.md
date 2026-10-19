@@ -64,18 +64,16 @@ so hosting-level cache behavior should be verified after any future deployment.
 Map tiles remain at `map.ninesolsmap.com`. This cleanup does not migrate hosting,
 create a Google ad unit, or change provider/account settings.
 
-## Ad banner and local preview
+## Ad placement comparison
 
-Set `ADSENSE_LOCAL_PREVIEW=1` before building and starting locally to preview the responsive AdSense unit in test mode. The preview only renders on localhost, below the map. Vercel production renders the live unit on ninesolsmap.com only when the PostHog `ad-banner-enabled` flag is true; Vercel preview deployments render the unit in Google test mode, without production analytics. Google may return an empty slot locally.
+[ad-banner-enabled](https://eu.posthog.com/project/296403/feature_flags/319553) is the only flag. Its public multivariate rollout assigns 50% of browsers to `custom` and 50% to `google-anchor`. Disable the flag to stop loading ads. Missing, invalid, or failed evaluations default to no ads. PostHog's existing browser identifier keeps assignment stable; clearing site data changes identity. No tester URLs or tester properties are used.
 
-The × button hides the unit until reload without saving a preference. Preview events are exposed as `ninesolsmap:ad-banner-event` browser events for tests; localhost does not send them to PostHog. The lifecycle covers requests, filled/empty results, loader failures, visible filled ads, and dismissal. No diagnostic console logs are added. The [PostHog dashboard](https://eu.posthog.com/project/296403/dashboard/1002411) has live show/dismiss counts and dismissal rate; these are not AdSense billable impression counts.
+The custom unit sits below the map, full width on phones and centered on desktop. Its × button dismisses until reload without saving a preference. Blocked, empty and unanswered (15 seconds) slots collapse. Google anchors have Google's own close control; the app does not claim to observe their impressions or dismissals.
 
-Run the preview tests with `ADSENSE_LOCAL_PREVIEW=1 pnpm test:e2e tests/ad-preview.spec.ts`.
+The anchor branch loads only Google's script with the [documented `data-overlays="collapsed-bottom"` setting](https://support.google.com/adsense/answer/7478225?hl=en), which opts into regular bottom anchors rather than expanding/top anchors. The custom branch creates only the manual unit. Keep site-wide Auto ads and Auto optimize OFF in AdSense so global placements cannot contaminate the custom group. The code override opts the anchor group into anchors separately; actual fill is Google's decision.
 
-Blocked, empty, or unanswered (15 seconds) slots collapse so the map regains the space. The close control disappears with the slot.
+PostHog records `ad_variant_assigned` once per map page load, tags custom lifecycle events with `ad_variant=custom`, and records anchor script requests/failures with `ad_variant=google-anchor`. The [dashboard](https://eu.posthog.com/project/296403/dashboard/1002411) custom show/dismiss charts do not measure Google anchor closes or billable impressions. Revenue must be read from AdSense; assignment counts are not revenue or fill metrics.
 
-The [ad-banner-enabled flag](https://eu.posthog.com/project/296403/feature_flags/319553) starts off. Missing flags or flag-request errors keep ads hidden and prevent the banner loader from mounting. Open pages refresh the flag every 60 seconds and when the window regains focus. Switching off takes effect after the next successful refresh; it cannot recall requests already sent. Local preview bypasses this production gate and stays in Google test mode.
+Flags refresh every minute and on window focus. Once initialized, a page retains its ad mode to avoid loading both implementations. Disabling prevents new loads and unmounts our custom unit; Google's already injected anchors may persist until reload. Changing variants takes effect on a new page load.
 
-For browser-specific live testing, the flag condition requires `ad_banner_tester=true`. Open `https://ninesolsmap.com/?ads-test=on` to opt this browser in, or `?ads-test=off` to opt out. PostHog keeps this override in its existing browser persistence. This is a test audience, not authentication: anyone with the opt-in link can opt in. General visitors remain excluded. Turn the flag off to stop all tester ads.
-
-Google Auto ads are configured separately in AdSense. Disable Auto ads for ninesolsmap.com to prevent additional anchor/fullscreen placements; do not add CSS that conceals or clips Google-injected ads. Preview hostnames are not approved live-ad sites and may receive no Google creative.
+Vercel previews and `ADSENSE_LOCAL_PREVIEW=1` use only the custom unit in Google test mode and exclude production analytics. Preview hostnames may receive no creative. Run `ADSENSE_LOCAL_PREVIEW=1 pnpm test:e2e tests/ad-preview.spec.ts` for deterministic filled/empty/blocked/timeout checks.

@@ -10,12 +10,14 @@ import posthog from 'posthog-js';
 const publisher = 'ca-pub-1640535171105894';
 const slot = '9790698796';
 
+type AdVariant = 'custom' | 'google-anchor';
+
 type AdStatus = 'pending' | 'filled' | 'unfilled' | 'error';
 type AdBannerEvent = 'ad_banner_requested' | 'ad_banner_result' | 'ad_banner_failed' | 'ad_banner_shown' | 'ad_banner_dismissed';
 type AdProperties = {ad_status:AdStatus;was_shown:boolean;ms_since_shown?:number;failure_stage?:'script'|'initialization'};
 
 function recordAdEvent(event:AdBannerEvent, properties:AdProperties & {ad_request_id:string;ms_since_request:number}) {
-  const payload = {ad_slot:slot,ad_layout:window.innerWidth < 800 ? 'mobile' : 'desktop',...properties};
+  const payload = {ad_variant:'custom',ad_slot:slot,ad_layout:window.innerWidth < 800 ? 'mobile' : 'desktop',...properties};
   if (['ninesolsmap.com','www.ninesolsmap.com'].includes(window.location.hostname)) {
     if (posthog.__loaded) posthog.capture(event,payload);
   } else {
@@ -127,28 +129,48 @@ function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}
   </section>;
 }
 
-/** Responsive map ad: live on the production domain, test mode on localhost when enabled. */
+function GoogleBottomAnchor() {
+  const requested = useRef(false);
+  const capture = useCallback((event:'ad_anchor_requested'|'ad_anchor_failed') => {
+    if (posthog.__loaded) posthog.capture(event,{ad_variant:'google-anchor',ad_layout:window.innerWidth < 800 ? 'mobile' : 'desktop'});
+  },[]);
+  useEffect(()=>{
+    if (requested.current) return;
+    requested.current = true;
+    capture('ad_anchor_requested');
+  },[capture]);
+  return <Script id="adsense-google-anchor" async crossOrigin="anonymous"
+    data-overlays="collapsed-bottom"
+    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisher}`}
+    onError={()=>capture('ad_anchor_failed')} />;
+}
+
+/** One browser-stable public ad variant; previews always use the custom unit in test mode. */
 export function AdBanner({children,preview}:{children:ReactNode;preview:boolean}) {
   const pathname = usePathname();
   const [allowed,setAllowed] = useState(false);
   const [dismissed,setDismissed] = useState(false);
-  const [enabled,setEnabled] = useState(false);
+  const [variant,setVariant] = useState<AdVariant|null>(null);
+  const assignment = useRef<AdVariant|null>(null);
+  const reported = useRef(false);
   useEffect(()=>{
     const hosts = preview ? ['localhost','127.0.0.1','[::1]'] : ['ninesolsmap.com','www.ninesolsmap.com'];
     setAllowed(hosts.includes(window.location.hostname) || (preview && window.location.hostname.endsWith('.vercel.app')));
   },[preview]);
   useEffect(()=>{
-    if (preview) { setEnabled(true);return; }
+    if (preview) { setVariant('custom');return; }
     if (!allowed) return;
-    const tester = new URLSearchParams(window.location.search).get('ads-test');
-    if (tester === 'on' || tester === 'off') {
-      posthog.setPersonPropertiesForFlags({ad_banner_tester:tester === 'on'},false);
-    }
-    // Ignore a synchronous cached result; wait for this page's fresh response.
+    // Wait for a fresh response instead of using a cached flag on initial load.
     let subscribing = true;
     const unsubscribe = posthog.onFeatureFlags((_flags,_variants,context)=>{
       if (subscribing) return;
-      setEnabled(!context?.errorsLoading && posthog.isFeatureEnabled('ad-banner-enabled') === true);
+      const value = context?.errorsLoading ? false : posthog.getFeatureFlag('ad-banner-enabled');
+      // Boolean true supports the previous tester-only flag during deployment migration.
+      const next = value === true ? 'custom' : value === 'custom' || value === 'google-anchor' ? value : null;
+      if (!next) { setVariant(null);return; }
+      // AdSense initializes per document: never swap loader modes without a page reload.
+      assignment.current ??= next;
+      setVariant(assignment.current);
     });
     subscribing = false;
     const refresh = () => posthog.reloadFeatureFlags();
@@ -157,11 +179,15 @@ export function AdBanner({children,preview}:{children:ReactNode;preview:boolean}
     window.addEventListener('focus',refresh);
     return ()=>{ unsubscribe();window.clearInterval(timer);window.removeEventListener('focus',refresh); };
   },[allowed,preview]);
-  const dismiss = () => {
-    setDismissed(true);
-  };
   const parts = pathname.split('/').filter(Boolean);
   const page = parts[0] === 'zh-CN' || parts[0] === 'zh-TW' ? parts.slice(1) : parts;
   const map = page.length <= 1 && !['about','privacy','locations'].includes(page[0]);
-  return <>{children}{allowed && enabled && map && !dismissed ? <ResponsiveUnit key={pathname} preview={preview} onDismiss={dismiss} /> : null}</>;
+  useEffect(()=>{
+    if (!allowed || !variant || !map || preview || reported.current) return;
+    reported.current = true;
+    posthog.capture('ad_variant_assigned',{ad_variant:variant,ad_layout:window.innerWidth < 800 ? 'mobile' : 'desktop'});
+  },[allowed,variant,map,preview]);
+  return <>{children}{allowed && variant && map && !dismissed ? variant === 'custom'
+    ? <ResponsiveUnit key={pathname} preview={preview} onDismiss={()=>setDismissed(true)} />
+    : <GoogleBottomAnchor /> : null}</>;
 }
