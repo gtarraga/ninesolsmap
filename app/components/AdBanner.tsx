@@ -22,10 +22,9 @@ function recordAdEvent(event:AdBannerEvent, properties:AdProperties & {ad_reques
     // A browser-observable preview stream verifies payloads without polluting live analytics.
     window.dispatchEvent(new CustomEvent('ninesolsmap:ad-banner-event',{detail:{event,properties:payload}}));
   }
-
 }
 
-function ResponsiveUnit({onDismiss}:{onDismiss:()=>void}) {
+function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}) {
   const t = useTranslations();
   const element = useRef<HTMLModElement>(null);
   const requested = useRef(false);
@@ -63,7 +62,7 @@ function ResponsiveUnit({onDismiss}:{onDismiss:()=>void}) {
     };
     const update = () => {
       if (node.dataset.adStatus === 'filled') { adStatus.current = 'filled';setStatus('Google returned an ad.'); }
-      if (node.dataset.adStatus === 'unfilled') { adStatus.current = 'unfilled';setStatus('Google returned an empty slot on localhost.'); }
+      if (node.dataset.adStatus === 'unfilled') { adStatus.current = 'unfilled';setStatus('Google returned an empty slot.'); }
       if (!outcomeRecorded.current && (adStatus.current === 'filled' || adStatus.current === 'unfilled')) {
         outcomeRecorded.current = true;
         emit('ad_banner_result',{ad_status:adStatus.current,was_shown:false});
@@ -95,7 +94,7 @@ function ResponsiveUnit({onDismiss}:{onDismiss:()=>void}) {
       fail('initialization','The Google ad loader was unavailable.');return;
     }
     try { queue.push({}); }
-    catch { fail('initialization','Google could not initialize this local preview.'); }
+    catch { fail('initialization','Google could not initialize the ad.'); }
   };
 
   const dismiss = () => {
@@ -104,7 +103,7 @@ function ResponsiveUnit({onDismiss}:{onDismiss:()=>void}) {
     onDismiss();
   };
 
-  return <section className="local-ad-preview" aria-label="Local AdSense preview" data-preview-status={status}>
+  return <section className="local-ad-preview" aria-label={preview ? "Local AdSense preview" : "Advertisement"} data-preview-status={status}>
     <style>{`
       .local-ad-preview { flex:none; width:100%; padding:4px 0 max(6px,env(safe-area-inset-bottom)); text-align:center; background:transparent; }
       .local-ad-preview .local-ad-unit { display:block; width:100%; max-width:728px; height:50px; margin:0 auto; background:var(--panel); }
@@ -120,26 +119,27 @@ function ResponsiveUnit({onDismiss}:{onDismiss:()=>void}) {
       </button>
     </div>
     <ins ref={element} className="adsbygoogle local-ad-unit" data-ad-client={publisher}
-      data-ad-slot={slot} data-adtest="on" />
-    <Script id="adsense-local-preview" async crossOrigin="anonymous"
+      data-ad-slot={slot} data-adtest={preview ? "on" : undefined} />
+    <Script id="adsense-banner" async crossOrigin="anonymous"
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisher}`}
       onReady={request} onError={()=>fail('script','Google’s ad script was blocked or could not load.')} />
   </section>;
 }
 
-/** Local-only test of the actual responsive unit; never mount it on a deployed hostname. */
-export function AdSenseLocalPreview({children}:{children:ReactNode}) {
+/** Responsive map ad: live on the production domain, test mode on localhost when enabled. */
+export function AdBanner({children,preview}:{children:ReactNode;preview:boolean}) {
   const pathname = usePathname();
-  const [local,setLocal] = useState(false);
+  const [allowed,setAllowed] = useState(false);
   const [dismissed,setDismissed] = useState(false);
   useEffect(()=>{
-    setLocal(['localhost','127.0.0.1','[::1]'].includes(window.location.hostname));
-  },[]);
+    const hosts = preview ? ['localhost','127.0.0.1','[::1]'] : ['ninesolsmap.com','www.ninesolsmap.com'];
+    setAllowed(hosts.includes(window.location.hostname));
+  },[preview]);
   const dismiss = () => {
     setDismissed(true);
   };
   const parts = pathname.split('/').filter(Boolean);
   const page = parts[0] === 'zh-CN' || parts[0] === 'zh-TW' ? parts.slice(1) : parts;
   const map = page.length <= 1 && !['about','privacy','locations'].includes(page[0]);
-  return <>{children}{local && map && !dismissed ? <ResponsiveUnit key={pathname} onDismiss={dismiss} /> : null}</>;
+  return <>{children}{allowed && map && !dismissed ? <ResponsiveUnit key={pathname} preview={preview} onDismiss={dismiss} /> : null}</>;
 }

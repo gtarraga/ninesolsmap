@@ -21,6 +21,7 @@ test.beforeEach(async({page,request})=>{
 test('close records one event, frees the map, and resets on reload without cookies or storage',async({page,context})=>{
   await page.goto('/');
   await expect.poll(()=>page.evaluate(()=>Reflect.get(window,'adPreviewEvents').length)).toBe(3);
+  await expect(page.locator('ins.adsbygoogle')).toHaveAttribute('data-adtest','on');
   const cookies = await context.cookies();
   await expect(page.locator('.local-ad-preview')).not.toContainText(/ADVERTISEMENT|LOCAL TEST|Google returned|Waiting/);
   await expect(page.getByRole('button',{name:'Hide ad until reload'})).toHaveText('×');

@@ -64,10 +64,10 @@ so hosting-level cache behavior should be verified after any future deployment.
 Map tiles remain at `map.ninesolsmap.com`. This cleanup does not migrate hosting,
 create a Google ad unit, or change provider/account settings.
 
-## Local ad preview
+## Ad banner and local preview
 
-Set `ADSENSE_LOCAL_PREVIEW=1` before building and starting locally to preview the responsive AdSense unit in test mode. It only renders on localhost, below the map, and never enables a deployed banner. Google may return an empty slot locally.
+Set `ADSENSE_LOCAL_PREVIEW=1` before building and starting locally to preview the responsive AdSense unit in test mode. The preview only renders on localhost, below the map. Vercel production renders the live unit on ninesolsmap.com; preview deployments do not render banners. Google may return an empty slot locally.
 
-The × button hides the unit until reload without saving a preference. Preview events are exposed as `ninesolsmap:ad-banner-event` browser events for tests; localhost does not send them to PostHog. The lifecycle covers requests, filled/empty results, loader failures, visible filled ads, and dismissal. No diagnostic console logs are added. The [PostHog dashboard](https://eu.posthog.com/project/296403/dashboard/1002411) has show/dismiss counts and dismissal rate ready for a future live rollout; these are not AdSense billable impression counts.
+The × button hides the unit until reload without saving a preference. Preview events are exposed as `ninesolsmap:ad-banner-event` browser events for tests; localhost does not send them to PostHog. The lifecycle covers requests, filled/empty results, loader failures, visible filled ads, and dismissal. No diagnostic console logs are added. The [PostHog dashboard](https://eu.posthog.com/project/296403/dashboard/1002411) has live show/dismiss counts and dismissal rate; these are not AdSense billable impression counts.
 
 Run the preview tests with `ADSENSE_LOCAL_PREVIEW=1 pnpm test:e2e tests/ad-preview.spec.ts`.

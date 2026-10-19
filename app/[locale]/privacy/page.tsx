@@ -11,7 +11,7 @@ export async function generateMetadata({params:{locale}}:{params:{locale:string}
     alternates:pageAlternates(locale,'/privacy')};
 }
 
-/** Describe the current services and tracking without claiming that future ads are active. */
+/** Describe current analytics, hosting and advertising data use. */
 export default async function PrivacyPage({params:{locale}}:{params:{locale:string}}) {
   if (!isLocale(locale)) notFound();
   const t = await getTranslations({locale});
@@ -23,6 +23,7 @@ export default async function PrivacyPage({params:{locale}}:{params:{locale:stri
     </section>)}
     <nav className="about-links" aria-label={t('privacy')}>
       <a href="https://posthog.com/privacy">{t('privacy-posthog')}</a>
+      <a href="https://myadcenter.google.com/">{t('privacy-ad-settings')}</a>
       <a href="https://policies.google.com/privacy">{t('privacy-google')}</a>
       <a href="https://github.com/gtarraga/ninesolsmap/issues">{t('about-issue-link')}</a>
     </nav>
