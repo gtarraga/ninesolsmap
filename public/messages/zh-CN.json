@@ -56,17 +56,18 @@
   "back-to-map": "返回地图",
   "privacy": "隐私",
   "privacy-title": "隐私说明",
-  "privacy-updated": "最后更新：2026年10月11日",
+  "privacy-updated": "最后更新：2026年10月19日",
   "privacy-intro": "Nine Sols Map 由 gtarraga 维护。无需注册账户即可使用地图。",
   "privacy-analytics-title": "使用情况分析",
   "privacy-analytics": "我们使用托管在欧盟的 PostHog 了解地图的使用情况。它收集页面访问、交互、浏览器和设备信息以及 IP 地址。目前的配置使用第一方 Cookie 和浏览器存储来区分访客及会话，尚未启用无 Cookie 跟踪。当分析项目启用会话录制时，可能会收集使用过程的录制。",
   "privacy-hosting-title": "托管与地图数据",
   "privacy-hosting": "Vercel 托管网站，Cloudflare 提供网络传输和分析代理，Supabase 存储公开的标记数据。这些服务会处理 IP 地址等网络信息以提供网站。浏览地图无需登录 Supabase。",
   "privacy-ads-title": "广告",
-  "privacy-ads": "目前未启用广告。ads.txt 文件仅标识我们的 Google AdSense 发布商账户，不会显示广告。启用广告前，我们会更新本页并配置相应的隐私选项。",
+  "privacy-ads": "我们使用 Google AdSense 展示广告。Google 和其他广告合作伙伴可能收集页面网址、IP 地址、浏览器信息和标识符，并可能使用 Cookie 或网络信标来投放和衡量广告。在提供个性化广告时，广告可能基于您对本网站及其他网站的访问。您可以通过 Google 我的广告中心管理个性化广告。关闭横幅仅持续到刷新页面，不会保存偏好。",
   "privacy-choices-title": "您的选择与问题",
   "privacy-choices": "您可以通过浏览器设置清除本站的 Cookie 和浏览器存储。如有隐私问题或数据相关请求，请通过项目的 GitHub Issues 联系维护者。请勿在公开的问题中包含私人信息。",
   "privacy-posthog": "PostHog 隐私政策",
+  "privacy-ad-settings": "Google 广告设置",
   "privacy-google": "Google 隐私政策",
   "locations": "地点",
   "locations-title": "九日地点目录",
@@ -76,5 +77,6 @@
   "location-unavailable": "地点备注暂时无法加载，您仍可尝试打开地图。",
   "location-empty": "此地点暂无其他备注。",
   "location-reference": "标记编号：{id}",
-  "locations-back": "所有地点"
+  "locations-back": "所有地点",
+  "hide-ad-until-reload": "隐藏广告（刷新后恢复）"
 }

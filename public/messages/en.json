@@ -56,17 +56,18 @@
   "back-to-map": "Back to the map",
   "privacy": "Privacy",
   "privacy-title": "Privacy",
-  "privacy-updated": "Last updated: 11 October 2026",
+  "privacy-updated": "Last updated: 19 October 2026",
   "privacy-intro": "Nine Sols Map is maintained by gtarraga. You can use the map without an account.",
   "privacy-analytics-title": "Analytics",
   "privacy-analytics": "We use PostHog, hosted in the EU, to understand how the map is used. It collects page visits, interactions, browser and device information, and IP addresses. The current setup uses first-party cookies and browser storage to distinguish visitors and sessions. Cookieless tracking is not currently enabled. Session recordings may be collected when enabled in the analytics project.",
   "privacy-hosting-title": "Hosting and map data",
   "privacy-hosting": "Vercel hosts the site, Cloudflare handles network delivery and the analytics proxy, and Supabase stores public marker data. These services process network information, such as IP addresses, to deliver the site. Browsing the map does not require signing in to Supabase.",
   "privacy-ads-title": "Advertising",
-  "privacy-ads": "Advertising is not currently enabled. The ads.txt file identifies our Google AdSense publisher account; it does not display ads. We will update this page and configure the appropriate privacy choices before enabling advertising.",
+  "privacy-ads": "We use Google AdSense to display ads. Google and other advertising partners may collect page URLs, IP addresses, browser information and identifiers, and may use cookies or web beacons to serve and measure ads. Where personalized ads are available, they may be based on visits to this and other sites. You can manage personalized advertising through Google My Ad Center. Closing the banner lasts until reload and does not save a preference.",
   "privacy-choices-title": "Your choices and questions",
   "privacy-choices": "You can clear site cookies and browser storage through your browser settings. For questions about privacy or requests concerning your data, contact the maintainer through the project’s GitHub issues. Do not include private information in a public issue.",
   "privacy-posthog": "PostHog privacy policy",
+  "privacy-ad-settings": "Google ad settings",
   "privacy-google": "Google privacy policy",
   "locations": "Locations",
   "locations-title": "Locations in Nine Sols",
@@ -76,5 +77,6 @@
   "location-unavailable": "Location notes are temporarily unavailable. You can still try loading the map.",
   "location-empty": "No additional note has been added for this location.",
   "location-reference": "Marker reference: {id}",
-  "locations-back": "All locations"
+  "locations-back": "All locations",
+  "hide-ad-until-reload": "Hide ad until reload"
 }
