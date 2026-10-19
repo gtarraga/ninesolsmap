@@ -34,6 +34,7 @@ function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}
   const requestRecorded = useRef(false);
   const outcomeRecorded = useRef(false);
   const [status,setStatus] = useState('Waiting for Google’s preview ad…');
+  const [collapsed,setCollapsed] = useState(false);
   const emit = useCallback((event:AdBannerEvent,properties:AdProperties)=>{
     const current = attempt.current ??= {id:crypto.randomUUID(),startedAt:performance.now()};
     recordAdEvent(event,{...properties,ad_request_id:current.id,ms_since_request:Math.round(performance.now()-current.startedAt)});
@@ -44,7 +45,7 @@ function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}
     emit('ad_banner_requested',{ad_status:'pending',was_shown:false});
   },[emit]);
   const fail = useCallback((stage:'script'|'initialization',message:string)=>{
-    adStatus.current = 'error';setStatus(message);
+    adStatus.current = 'error';setStatus(message);setCollapsed(true);
     if (outcomeRecorded.current) return;
     outcomeRecorded.current = true;
     emit('ad_banner_failed',{ad_status:'error',was_shown:false,failure_stage:stage});
@@ -61,8 +62,8 @@ function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}
       emit('ad_banner_shown',{ad_status:'filled',was_shown:true});
     };
     const update = () => {
-      if (node.dataset.adStatus === 'filled') { adStatus.current = 'filled';setStatus('Google returned an ad.'); }
-      if (node.dataset.adStatus === 'unfilled') { adStatus.current = 'unfilled';setStatus('Google returned an empty slot.'); }
+      if (node.dataset.adStatus === 'filled') { adStatus.current = 'filled';setStatus('Google returned an ad.');setCollapsed(false); }
+      if (node.dataset.adStatus === 'unfilled') { adStatus.current = 'unfilled';setStatus('Google returned an empty slot.');setCollapsed(true); }
       if (!outcomeRecorded.current && (adStatus.current === 'filled' || adStatus.current === 'unfilled')) {
         outcomeRecorded.current = true;
         emit('ad_banner_result',{ad_status:adStatus.current,was_shown:false});
@@ -79,7 +80,7 @@ function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}
     document.addEventListener('visibilitychange',recordShown);
     update();
     const timer = window.setTimeout(()=>{
-      if (!node.dataset.adStatus) setStatus('No ad returned yet. Localhost may not receive an ad.');
+      if (!node.dataset.adStatus) {setStatus('No ad returned yet.');setCollapsed(true);}
     },15000);
     return ()=>{ observer.disconnect();visibility.disconnect();document.removeEventListener('visibilitychange',recordShown);window.clearTimeout(timer); };
   },[beginAttempt,emit]);
@@ -103,7 +104,7 @@ function ResponsiveUnit({onDismiss,preview}:{onDismiss:()=>void;preview:boolean}
     onDismiss();
   };
 
-  return <section className="local-ad-preview" aria-label={preview ? "Local AdSense preview" : "Advertisement"} data-preview-status={status}>
+  return <section hidden={collapsed} className="local-ad-preview" aria-label={preview ? "Local AdSense preview" : "Advertisement"} data-preview-status={status}>
     <style>{`
       .local-ad-preview { flex:none; width:100%; padding:4px 0 max(6px,env(safe-area-inset-bottom)); text-align:center; background:transparent; }
       .local-ad-preview .local-ad-unit { display:block; width:100%; max-width:728px; height:50px; margin:0 auto; background:var(--panel); }
@@ -134,11 +135,15 @@ export function AdBanner({children,preview}:{children:ReactNode;preview:boolean}
   const [enabled,setEnabled] = useState(false);
   useEffect(()=>{
     const hosts = preview ? ['localhost','127.0.0.1','[::1]'] : ['ninesolsmap.com','www.ninesolsmap.com'];
-    setAllowed(hosts.includes(window.location.hostname));
+    setAllowed(hosts.includes(window.location.hostname) || (preview && window.location.hostname.endsWith('.vercel.app')));
   },[preview]);
   useEffect(()=>{
     if (preview) { setEnabled(true);return; }
     if (!allowed) return;
+    const tester = new URLSearchParams(window.location.search).get('ads-test');
+    if (tester === 'on' || tester === 'off') {
+      posthog.setPersonPropertiesForFlags({ad_banner_tester:tester === 'on'},false);
+    }
     // Ignore a synchronous cached result; wait for this page's fresh response.
     let subscribing = true;
     const unsubscribe = posthog.onFeatureFlags((_flags,_variants,context)=>{

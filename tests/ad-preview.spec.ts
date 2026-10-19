@@ -52,17 +52,16 @@ test('close records one event, frees the map, and resets on reload without cooki
   await expect(page.locator('.local-ad-preview')).toBeVisible();
 });
 
-test('closing an unfilled slot is excluded from filled-ad dismissal metrics',async({page})=>{
+test('unfilled slot collapses without a false dismissal event',async({page})=>{
   await page.route('https://pagead2.googlesyndication.com/pagead/js/**',route=>route.fulfill({
     contentType:'application/javascript',body:`window.adsbygoogle={push(){document.querySelector('ins.adsbygoogle').dataset.adStatus='unfilled';}};`,
   }));
   await page.goto('/');
   await expect(page.locator('.local-ad-preview')).toHaveAttribute('data-preview-status',/empty slot/);
-  await page.getByRole('button',{name:'Hide ad until reload'}).click();
+  await expect(page.locator('.local-ad-preview')).toBeHidden();
   expect(await page.evaluate(()=>Reflect.get(window,'adPreviewEvents'))).toEqual([
     {event:'ad_banner_requested',properties:expect.objectContaining({ad_status:'pending',was_shown:false})},
     {event:'ad_banner_result',properties:expect.objectContaining({ad_status:'unfilled',was_shown:false})},
-    {event:'ad_banner_dismissed',properties:expect.objectContaining({ad_slot:'9790698796',ad_layout:'mobile',ad_status:'unfilled',was_shown:false})},
   ]);
 });
 
@@ -71,8 +70,20 @@ test('blocked script records one failure event without a shown event',async({pag
   await page.route('https://pagead2.googlesyndication.com/pagead/js/**',route=>route.abort());
   await page.goto('/');
   await expect(page.locator('.local-ad-preview')).toHaveAttribute('data-preview-status',/blocked/);
+  await expect(page.locator('.local-ad-preview')).toBeHidden();
   expect(await page.evaluate(()=>Reflect.get(window,'adPreviewEvents'))).toEqual([
     {event:'ad_banner_requested',properties:expect.objectContaining({ad_status:'pending'})},
     {event:'ad_banner_failed',properties:expect.objectContaining({ad_status:'error',failure_stage:'script',was_shown:false})},
   ]);
+});
+
+test('silent ad loader timeout collapses unused space',async({page})=>{
+  await page.clock.install();
+  await page.route('https://pagead2.googlesyndication.com/pagead/js/**',route=>route.fulfill({
+    contentType:'application/javascript',body:'window.adsbygoogle={push(){}};',
+  }));
+  await page.goto('/');
+  await expect(page.locator('.local-ad-preview')).toBeVisible();
+  await page.clock.fastForward(16000);
+  await expect(page.locator('.local-ad-preview')).toBeHidden();
 });

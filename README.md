@@ -66,10 +66,16 @@ create a Google ad unit, or change provider/account settings.
 
 ## Ad banner and local preview
 
-Set `ADSENSE_LOCAL_PREVIEW=1` before building and starting locally to preview the responsive AdSense unit in test mode. The preview only renders on localhost, below the map. Vercel production renders the live unit on ninesolsmap.com only when the PostHog `ad-banner-enabled` flag is true; preview deployments do not render banners. Google may return an empty slot locally.
+Set `ADSENSE_LOCAL_PREVIEW=1` before building and starting locally to preview the responsive AdSense unit in test mode. The preview only renders on localhost, below the map. Vercel production renders the live unit on ninesolsmap.com only when the PostHog `ad-banner-enabled` flag is true; Vercel preview deployments render the unit in Google test mode, without production analytics. Google may return an empty slot locally.
 
 The × button hides the unit until reload without saving a preference. Preview events are exposed as `ninesolsmap:ad-banner-event` browser events for tests; localhost does not send them to PostHog. The lifecycle covers requests, filled/empty results, loader failures, visible filled ads, and dismissal. No diagnostic console logs are added. The [PostHog dashboard](https://eu.posthog.com/project/296403/dashboard/1002411) has live show/dismiss counts and dismissal rate; these are not AdSense billable impression counts.
 
 Run the preview tests with `ADSENSE_LOCAL_PREVIEW=1 pnpm test:e2e tests/ad-preview.spec.ts`.
 
+Blocked, empty, or unanswered (15 seconds) slots collapse so the map regains the space. The close control disappears with the slot.
+
 The [ad-banner-enabled flag](https://eu.posthog.com/project/296403/feature_flags/319553) starts off. Missing flags or flag-request errors keep ads hidden and prevent the banner loader from mounting. Open pages refresh the flag every 60 seconds and when the window regains focus. Switching off takes effect after the next successful refresh; it cannot recall requests already sent. Local preview bypasses this production gate and stays in Google test mode.
+
+For browser-specific live testing, the flag condition requires `ad_banner_tester=true`. Open `https://ninesolsmap.com/?ads-test=on` to opt this browser in, or `?ads-test=off` to opt out. PostHog keeps this override in its existing browser persistence. This is a test audience, not authentication: anyone with the opt-in link can opt in. General visitors remain excluded. Turn the flag off to stop all tester ads.
+
+Google Auto ads are configured separately in AdSense. Disable Auto ads for ninesolsmap.com to prevent additional anchor/fullscreen placements; do not add CSS that conceals or clips Google-injected ads. Preview hostnames are not approved live-ad sites and may receive no Google creative.
