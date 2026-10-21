@@ -4,6 +4,7 @@ const withNextIntl = createNextIntlPlugin('./i18n.ts');
  
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: { instrumentationHook: true },
   async redirects() {
     return [{source:'/en/:path*',destination:'/:path*',permanent:true}];
   },

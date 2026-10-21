@@ -10,7 +10,8 @@
     "icons:generate": "node scripts/generate-sprite.mjs",
     "prebuild": "node scripts/generate-sprite.mjs",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:tls": "node --test tests/tls-trust.test.mjs"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.0.0",
