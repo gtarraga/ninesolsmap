@@ -43,7 +43,7 @@ test("native HTTPS and fetch reject every published compromised chain", {
   const { default: https } = await import("node:https");
   const rejected = new Set([
     "UNABLE_TO_GET_ISSUER_CERT_LOCALLY", "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
-    "SELF_SIGNED_CERT_IN_CHAIN", "CERT_UNTRUSTED",
+    "SELF_SIGNED_CERT_IN_CHAIN", "CERT_UNTRUSTED", "CERT_REVOKED",
   ]);
   const before = tls.getCACertificates("default");
   try {
