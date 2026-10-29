@@ -10,8 +10,6 @@ import posthog from 'posthog-js';
 const publisher = 'ca-pub-1640535171105894';
 const slot = '9790698796';
 
-type AdVariant = 'custom' | 'google-anchor';
-
 type AdStatus = 'pending' | 'filled' | 'unfilled' | 'error';
 type AdBannerEvent = 'ad_banner_requested' | 'ad_banner_result' | 'ad_banner_failed' | 'ad_banner_shown' | 'ad_banner_dismissed';
 type AdProperties = {ad_status:AdStatus;was_shown:boolean;ms_since_shown?:number;failure_stage?:'script'|'initialization'};
@@ -145,49 +143,19 @@ function GoogleBottomAnchor() {
     onError={()=>capture('ad_anchor_failed')} />;
 }
 
-/** One browser-stable public ad variant; previews always use the custom unit in test mode. */
+/** Production uses Google bottom anchors; the manual unit is reserved for test previews. */
 export function AdBanner({children,preview}:{children:ReactNode;preview:boolean}) {
   const pathname = usePathname();
   const [allowed,setAllowed] = useState(false);
   const [dismissed,setDismissed] = useState(false);
-  const [variant,setVariant] = useState<AdVariant|null>(null);
-  const assignment = useRef<AdVariant|null>(null);
-  const reported = useRef(false);
   useEffect(()=>{
     const hosts = preview ? ['localhost','127.0.0.1','[::1]'] : ['ninesolsmap.com','www.ninesolsmap.com'];
     setAllowed(hosts.includes(window.location.hostname) || (preview && window.location.hostname.endsWith('.vercel.app')));
   },[preview]);
-  useEffect(()=>{
-    if (preview) { setVariant('custom');return; }
-    if (!allowed) return;
-    // Wait for a fresh response instead of using a cached flag on initial load.
-    let subscribing = true;
-    const unsubscribe = posthog.onFeatureFlags((_flags,_variants,context)=>{
-      if (subscribing) return;
-      const value = context?.errorsLoading ? false : posthog.getFeatureFlag('ad-banner-enabled');
-      // Boolean true supports the previous tester-only flag during deployment migration.
-      const next = value === true ? 'custom' : value === 'custom' || value === 'google-anchor' ? value : null;
-      if (!next) { setVariant(null);return; }
-      // AdSense initializes per document: never swap loader modes without a page reload.
-      assignment.current ??= next;
-      setVariant(assignment.current);
-    });
-    subscribing = false;
-    const refresh = () => posthog.reloadFeatureFlags();
-    refresh();
-    const timer = window.setInterval(refresh,60000);
-    window.addEventListener('focus',refresh);
-    return ()=>{ unsubscribe();window.clearInterval(timer);window.removeEventListener('focus',refresh); };
-  },[allowed,preview]);
   const parts = pathname.split('/').filter(Boolean);
   const page = parts[0] === 'zh-CN' || parts[0] === 'zh-TW' ? parts.slice(1) : parts;
   const map = page.length <= 1 && !['about','privacy','locations'].includes(page[0]);
-  useEffect(()=>{
-    if (!allowed || !variant || !map || preview || reported.current) return;
-    reported.current = true;
-    posthog.capture('ad_variant_assigned',{ad_variant:variant,ad_layout:window.innerWidth < 800 ? 'mobile' : 'desktop'});
-  },[allowed,variant,map,preview]);
-  return <>{children}{allowed && variant && map && !dismissed ? variant === 'custom'
-    ? <ResponsiveUnit key={pathname} preview={preview} onDismiss={()=>setDismissed(true)} />
+  return <>{children}{allowed && map && !dismissed ? preview
+    ? <ResponsiveUnit key={pathname} preview onDismiss={()=>setDismissed(true)} />
     : <GoogleBottomAnchor /> : null}</>;
 }
