@@ -13,6 +13,9 @@ export function CSPostHogProvider({children}:{children:React.ReactNode}) {
       ui_host: 'https://eu.posthog.com',
       defaults: '2026-05-30',
       person_profiles: 'identified_only',
+      // The ad experiment is finished; keep analytics without flag evaluations.
+      advanced_disable_feature_flags: true,
+      advanced_disable_feature_flags_on_first_load: true,
     });
   },[]);
   return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
